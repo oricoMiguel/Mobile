@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fundo_escuro"
+    android:padding="16dp">
+
+    <!-- Barra do topo -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/barraTopo"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_barra_topo"
+        android:paddingStart="32dp"
+        android:paddingEnd="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SERV+"
+            android:textColor="@color/branco"
+            android:textSize="28sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/btnMenu"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_menu"
+            android:contentDescription="Menu"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Tag -->
+    <TextView
+        android:id="@+id/tagSkillPods"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_tag"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="3dp"
+        android:text="Skill Pods- Equipes Modulares"
+        android:textColor="@color/branco"
+        android:textSize="11sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/barraTopo" />
+
+    <!-- Título -->
+    <TextView
+        android:id="@+id/txtTitulo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="24dp"
+        android:gravity="center"
+        android:text="Monte sua equipe ideal com skill pods"
+        android:textColor="@color/branco"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tagSkillPods" />
+
+    <!-- Botões -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtTitulo">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnMonteEquipe"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_botao_branco"
+            android:minWidth="170dp"
+            android:paddingHorizontal="24dp"
+            android:text="Monte sua Equipe"
+            android:textAllCaps="false"
+            android:textColor="@color/preto"
+            android:textSize="16sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnVerSkillPods"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_botao_branco"
+            android:minWidth="135dp"
+            android:paddingHorizontal="24dp"
+            android:text="Ver Skill PODS"
+            android:textAllCaps="false"
+            android:textColor="@color/preto"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- Espaço do vídeo -->
+    <FrameLayout
+        android:id="@+id/containerVideo"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_video"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Video sobre a empresa"
+            android:textColor="@color/preto"
+            android:textSize="18sp" />
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="fundo_escuro">#3B0078</color>
+    <color name="roxo_card">#4A14B8</color>
+    <color name="roxo_botao">#6200FF</color>
+    <color name="cinza_campo">#E0E0E0</color>
+    <color name="branco">#FFFFFF</color>
+    <color name="preto">#000000</color>
+    <color name="barra_topo">#2B1D3A</color>
+    <color name="roxo_tag">#9B7BD6</color>
+    <color name="cinza_video">#D9D9D9</color>
+    <color name="roxo_titulo">#6A0DAD</color>
+</resources>
