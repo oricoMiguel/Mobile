@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,12 +17,14 @@ public class CadastroActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cadastro);
+        InsetsUtil.aplicar(this);
 
         Spinner spinner = findViewById(R.id.spinnerTipoConta);
         EditText edtNome = findViewById(R.id.edtNomeUsuario);
         EditText edtEmail = findViewById(R.id.edtEmail);
         EditText edtSenha = findViewById(R.id.edtSenha);
         Button btnEntrar = findViewById(R.id.btnEntrar);
+        TextView txtJaTenhoConta = findViewById(R.id.txtJaTenhoConta);
 
         String[] tipos = {"Freelancer", "Usuário"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -29,7 +32,6 @@ public class CadastroActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
 
         btnEntrar.setOnClickListener(v -> {
-            String tipo = spinner.getSelectedItem().toString();
             String nome = edtNome.getText().toString().trim();
             String email = edtEmail.getText().toString().trim();
             String senha = edtSenha.getText().toString();
@@ -43,7 +45,12 @@ public class CadastroActivity extends AppCompatActivity {
             // TODO: salvar/enviar os dados do cadastro (tipo, nome, email, senha)
 
             startActivity(new Intent(CadastroActivity.this, HomeActivity.class));
-            finish(); // impede que o botão "voltar" retorne ao cadastro
+            finish();
+        });
+
+        txtJaTenhoConta.setOnClickListener(v -> {
+            startActivity(new Intent(CadastroActivity.this, LoginActivity.class));
+            finish();
         });
     }
 }

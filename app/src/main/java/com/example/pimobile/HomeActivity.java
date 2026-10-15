@@ -1,11 +1,22 @@
 package com.example.pimobile;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.MediaController;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -13,20 +24,79 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        InsetsUtil.aplicar(this);
+        MenuUtil.configurar(this);
 
-        ImageView btnMenu = findViewById(R.id.btnMenu);
         Button btnMonteEquipe = findViewById(R.id.btnMonteEquipe);
         Button btnVerSkillPods = findViewById(R.id.btnVerSkillPods);
 
-        btnMenu.setOnClickListener(v ->
-                Toast.makeText(HomeActivity.this, "Menu", Toast.LENGTH_SHORT).show());
+        btnMonteEquipe.setOnClickListener(v ->
+                startActivity(new Intent(HomeActivity.this, MontarEquipeActivity.class)));
 
-        btnMonteEquipe.setOnClickListener(v -> {
-            // TODO: abrir a tela de montar equipe
+        btnVerSkillPods.setOnClickListener(v ->
+                startActivity(new Intent(HomeActivity.this, SkillPodsActivity.class)));
+
+        findViewById(R.id.txtVerTodos).setOnClickListener(v ->
+                startActivity(new Intent(HomeActivity.this, SkillPodsActivity.class)));
+
+        findViewById(R.id.btnNotificacoes).setOnClickListener(v ->
+                Toast.makeText(HomeActivity.this, "Sem notificações", Toast.LENGTH_SHORT).show());
+
+        configurarVideo();
+
+        carregarSkillPodsPopulares();
+    }
+
+    private void configurarVideo() {
+        View containerVideo = findViewById(R.id.containerVideo);
+        containerVideo.setClipToOutline(true); // respeita os cantos arredondados do bg_card_video
+
+        VideoView videoView = findViewById(R.id.videoEmpresa);
+        View capaVideo = findViewById(R.id.capaVideo);
+
+        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video_empresa);
+        videoView.setVideoURI(uri);
+
+        MediaController controles = new MediaController(this);
+        controles.setAnchorView(videoView);
+        videoView.setMediaController(controles);
+
+        capaVideo.setOnClickListener(v -> {
+            capaVideo.setVisibility(View.GONE);
+            videoView.setVisibility(View.VISIBLE);
+            videoView.start();
         });
 
-        btnVerSkillPods.setOnClickListener(v -> {
-            // TODO: abrir a tela de skill pods
+        videoView.setOnCompletionListener(mp -> {
+            videoView.setVisibility(View.GONE);
+            capaVideo.setVisibility(View.VISIBLE);
         });
+    }
+
+    private void carregarSkillPodsPopulares() {
+        LinearLayout lista = findViewById(R.id.listaPodsPopulares);
+        lista.removeAllViews();
+
+        List<SkillPodResumo> pods = SkillPodRepository.getPopulares();
+        LayoutInflater inflater = LayoutInflater.from(this);
+
+        for (SkillPodResumo pod : pods) {
+            View card = inflater.inflate(R.layout.item_skill_pod_popular, lista, false);
+
+            FrameLayout iconeContainer = card.findViewById(R.id.iconeContainer);
+            ImageView imgIcone = card.findViewById(R.id.imgIcone);
+            TextView txtNome = card.findViewById(R.id.txtNome);
+            TextView txtQuantidade = card.findViewById(R.id.txtQuantidade);
+
+            iconeContainer.setBackgroundResource(pod.getFundoIconeRes());
+            imgIcone.setImageResource(pod.getIconeRes());
+            txtNome.setText(pod.getNome());
+            txtQuantidade.setText(pod.getQuantidadeEspecialistas() + " especialistas");
+
+            card.setOnClickListener(v ->
+                    startActivity(new Intent(HomeActivity.this, SkillPodsActivity.class)));
+
+            lista.addView(card);
+        }
     }
 }
