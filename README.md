@@ -25,7 +25,7 @@ O **SERV+** nasceu de uma ideia simples: contratar um freelancer avulso nem semp
 
 O app também conta com uma **área administrativa** para acompanhar usuários, freelancers e pods.
 
-## Telas
+## Algumas Telas
 
 <div align="center">
 
