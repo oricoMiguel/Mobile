@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -52,7 +53,7 @@ public class SkillPodsActivity extends AppCompatActivity {
         txtVazio = findViewById(R.id.txtVazio);
         EditText edtBusca = findViewById(R.id.edtBusca);
 
-        todos = SkillPodRepository.getTodos();
+        todos = new ArrayList<>();
 
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
         findViewById(R.id.btnFiltro).setOnClickListener(v ->
@@ -70,7 +71,22 @@ public class SkillPodsActivity extends AppCompatActivity {
         });
 
         renderizarFiltros();
-        renderizarPods();
+
+        SkillPodRepository.getTodos(new Callback<List<SkillPod>>() {
+            @Override
+            public void onSucesso(List<SkillPod> pods) {
+                if (isFinishing() || isDestroyed()) return;
+                todos = pods;
+                renderizarPods();
+            }
+
+            @Override
+            public void onErro(Exception e) {
+                if (isFinishing() || isDestroyed()) return;
+                Toast.makeText(SkillPodsActivity.this,
+                        "Não foi possível carregar os Skill Pods", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void renderizarFiltros() {

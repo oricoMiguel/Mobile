@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -80,26 +79,39 @@ public class HomeActivity extends AppCompatActivity {
         LinearLayout lista = findViewById(R.id.listaPodsPopulares);
         lista.removeAllViews();
 
-        List<SkillPodResumo> pods = SkillPodRepository.getPopulares();
-        LayoutInflater inflater = LayoutInflater.from(this);
+        SkillPodRepository.getPopulares(new Callback<List<SkillPodResumo>>() {
+            @Override
+            public void onSucesso(List<SkillPodResumo> pods) {
+                if (isFinishing() || isDestroyed()) return;
+                lista.removeAllViews();
+                LayoutInflater inflater = LayoutInflater.from(HomeActivity.this);
 
-        for (SkillPodResumo pod : pods) {
-            View card = inflater.inflate(R.layout.item_skill_pod_popular, lista, false);
+                for (SkillPodResumo pod : pods) {
+                    View card = inflater.inflate(R.layout.item_skill_pod_popular, lista, false);
 
-            FrameLayout iconeContainer = card.findViewById(R.id.iconeContainer);
-            ImageView imgIcone = card.findViewById(R.id.imgIcone);
-            TextView txtNome = card.findViewById(R.id.txtNome);
-            TextView txtQuantidade = card.findViewById(R.id.txtQuantidade);
+                    FrameLayout iconeContainer = card.findViewById(R.id.iconeContainer);
+                    ImageView imgIcone = card.findViewById(R.id.imgIcone);
+                    TextView txtNome = card.findViewById(R.id.txtNome);
+                    TextView txtQuantidade = card.findViewById(R.id.txtQuantidade);
 
-            iconeContainer.setBackgroundResource(pod.getFundoIconeRes());
-            imgIcone.setImageResource(pod.getIconeRes());
-            txtNome.setText(pod.getNome());
-            txtQuantidade.setText(pod.getQuantidadeEspecialistas() + " especialistas");
+                    iconeContainer.setBackgroundResource(pod.getFundoIconeRes());
+                    imgIcone.setImageResource(pod.getIconeRes());
+                    txtNome.setText(pod.getNome());
+                    txtQuantidade.setText(pod.getQuantidadeEspecialistas() + " especialistas");
 
-            card.setOnClickListener(v ->
-                    startActivity(new Intent(HomeActivity.this, SkillPodsActivity.class)));
+                    card.setOnClickListener(v ->
+                            startActivity(new Intent(HomeActivity.this, SkillPodsActivity.class)));
 
-            lista.addView(card);
-        }
+                    lista.addView(card);
+                }
+            }
+
+            @Override
+            public void onErro(Exception e) {
+                if (isFinishing() || isDestroyed()) return;
+                Toast.makeText(HomeActivity.this,
+                        "Não foi possível carregar os Skill Pods", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

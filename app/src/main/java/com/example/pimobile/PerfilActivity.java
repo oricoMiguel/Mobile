@@ -22,15 +22,6 @@ public class PerfilActivity extends AppCompatActivity {
         setContentView(R.layout.activity_perfil);
         InsetsUtil.aplicar(this);
 
-        Perfil perfil = PerfilRepository.getPerfilAtual();
-
-        ((TextView) findViewById(R.id.txtIniciais)).setText(perfil.getIniciais());
-        ((TextView) findViewById(R.id.txtNome)).setText(perfil.getNome());
-        ((TextView) findViewById(R.id.txtTipoConta)).setText(perfil.getTipoConta());
-        ((TextView) findViewById(R.id.txtEmail)).setText(perfil.getEmail());
-        findViewById(R.id.badgeVerificado).setVisibility(
-                perfil.isVerificado() ? View.VISIBLE : View.GONE);
-
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
         findViewById(R.id.btnEditar).setOnClickListener(v -> emBreve());
 
@@ -41,17 +32,43 @@ public class PerfilActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        carregarOpcoes(perfil);
+        // Mostra a lista de opções já, e depois atualiza o contador quando o perfil chegar
+        carregarOpcoes(0);
+
+        PerfilRepository.getPerfilAtual(new Callback<Perfil>() {
+            @Override
+            public void onSucesso(Perfil perfil) {
+                if (isFinishing() || isDestroyed()) return;
+                preencher(perfil);
+                carregarOpcoes(perfil.getMensagensNaoLidas());
+            }
+
+            @Override
+            public void onErro(Exception e) {
+                if (isFinishing() || isDestroyed()) return;
+                Toast.makeText(PerfilActivity.this,
+                        "Não foi possível carregar o perfil", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
-    private void carregarOpcoes(Perfil perfil) {
+    private void preencher(Perfil perfil) {
+        ((TextView) findViewById(R.id.txtIniciais)).setText(perfil.getIniciais());
+        ((TextView) findViewById(R.id.txtNome)).setText(perfil.getNome());
+        ((TextView) findViewById(R.id.txtTipoConta)).setText(perfil.getTipoConta());
+        ((TextView) findViewById(R.id.txtEmail)).setText(perfil.getEmail());
+        findViewById(R.id.badgeVerificado).setVisibility(
+                perfil.isVerificado() ? View.VISIBLE : View.GONE);
+    }
+
+    private void carregarOpcoes(int mensagensNaoLidas) {
         LinearLayout lista = findViewById(R.id.listaOpcoes);
         lista.removeAllViews();
 
         adicionar(lista, R.drawable.ic_person, "Meu perfil", 0);
         adicionar(lista, R.drawable.ic_briefcase, "Meus projetos", 0);
         adicionar(lista, R.drawable.ic_pods, "Minhas equipes", 0);
-        adicionar(lista, R.drawable.ic_mail, "Mensagens", perfil.getMensagensNaoLidas());
+        adicionar(lista, R.drawable.ic_mail, "Mensagens", mensagensNaoLidas);
         adicionar(lista, R.drawable.ic_bell, "Notificações", 0);
         adicionar(lista, R.drawable.ic_settings, "Configurações", 0);
         adicionar(lista, R.drawable.ic_doc, "Termos e privacidade", 0);

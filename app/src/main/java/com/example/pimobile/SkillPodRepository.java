@@ -1,41 +1,87 @@
 package com.example.pimobile;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SkillPodRepository {
 
-    // TODO: quando houver dados reais (banco de dados ou API),
-    // buscar aqui os mesmos dados e ordenar pelos mais populares.
-    // A Home e a SkillPodsActivity usam esta mesma fonte.
-    public static List<SkillPodResumo> getPopulares() {
-        List<SkillPodResumo> lista = new ArrayList<>();
-        lista.add(new SkillPodResumo("Desenvolvimento", 4, R.drawable.ic_code, R.drawable.bg_icone_roxo));
-        lista.add(new SkillPodResumo("Design e UX", 3, R.drawable.ic_palette, R.drawable.bg_icone_verde));
-        return lista;
+    private static final String COLECAO = "skillPods";
+
+    private static final int[] FUNDOS = {
+            R.drawable.bg_icone_roxo, R.drawable.bg_icone_verde, R.drawable.bg_icone_laranja};
+
+    public static void getTodos(Callback<List<SkillPod>> callback) {
+        FirebaseFirestore.getInstance().collection(COLECAO)
+                .orderBy("ordem")
+                .get()
+                .addOnSuccessListener(query -> {
+                    List<SkillPod> lista = new ArrayList<>();
+                    for (DocumentSnapshot doc : query.getDocuments()) {
+                        lista.add(paraSkillPod(doc));
+                    }
+                    callback.onSucesso(lista);
+                })
+                .addOnFailureListener(callback::onErro);
     }
 
-    // TODO: trocar por dados reais (banco de dados ou API).
-    // A SkillPodsActivity só usa este método, então nada mais precisa mudar.
-    public static List<SkillPod> getTodos() {
-        List<SkillPod> lista = new ArrayList<>();
-        lista.add(new SkillPod("Pod Desenvolvimento web",
-                "Time completo para criar e publicar sites e sistemas web.", true,
-                Arrays.asList("Front-end", "Back-end", "QA"),
-                Arrays.asList("AS", "RP", "TC"), 3, R.drawable.ic_code, 0));
-        lista.add(new SkillPod("Pod Design e UX",
-                "Dupla para desenhar telas, fluxos e protótipos testáveis.", true,
-                Arrays.asList("UI", "UX", "Protótipo"),
-                Arrays.asList("CL", "MB"), 2, R.drawable.ic_palette, 1));
-        lista.add(new SkillPod("Pod Marketing digital",
-                "Equipe para lançar e divulgar sua marca nas redes.", true,
-                Arrays.asList("Conteúdo", "Tráfego", "Social"),
-                Arrays.asList("JM", "LF"), 4, R.drawable.ic_megaphone, 2));
-        lista.add(new SkillPod("Pod Workshops",
-                "Equipe no seu endereço para oficinas e prototipação.", false,
-                Arrays.asList("Facilitação", "Protótipo"),
-                Arrays.asList("PS", "AM", "RT"), 3, R.drawable.ic_palette, 1));
-        return lista;
+    public static void getPopulares(Callback<List<SkillPodResumo>> callback) {
+        FirebaseFirestore.getInstance().collection(COLECAO)
+                .orderBy("totalPessoas", Query.Direction.DESCENDING)
+                .limit(2)
+                .get()
+                .addOnSuccessListener(query -> {
+                    List<SkillPodResumo> lista = new ArrayList<>();
+                    for (DocumentSnapshot doc : query.getDocuments()) {
+                        SkillPod pod = paraSkillPod(doc);
+                        lista.add(new SkillPodResumo(pod.getNome(), pod.getTotalPessoas(),
+                                pod.getIconeRes(), FUNDOS[pod.getCor()]));
+                    }
+                    callback.onSucesso(lista);
+                })
+                .addOnFailureListener(callback::onErro);
+    }
+
+    private static SkillPod paraSkillPod(DocumentSnapshot doc) {
+        String nome = doc.getString("nome");
+        String descricao = doc.getString("descricao");
+        boolean digital = Boolean.TRUE.equals(doc.getBoolean("digital"));
+
+        Long total = doc.getLong("totalPessoas");
+        Long cor = doc.getLong("cor");
+        int corIndice = cor == null ? 0 : Math.max(0, Math.min(2, cor.intValue()));
+
+        return new SkillPod(
+                nome == null ? "Sem nome" : nome,
+                descricao == null ? "" : descricao,
+                digital,
+                listaDeTexto(doc.get("tags")),
+                listaDeTexto(doc.get("membros")),
+                total == null ? 0 : total.intValue(),
+                iconeParaRes(doc.getString("icone")),
+                corIndice);
+    }
+
+    private static List<String> listaDeTexto(Object valor) {
+        List<String> resultado = new ArrayList<>();
+        if (valor instanceof List<?>) {
+            for (Object item : (List<?>) valor) {
+                if (item != null) resultado.add(item.toString());
+            }
+        }
+        return resultado;
+    }
+
+    private static int iconeParaRes(String chave) {
+        if (chave == null) return R.drawable.ic_code;
+        switch (chave) {
+            case "palette":   return R.drawable.ic_palette;
+            case "megaphone": return R.drawable.ic_megaphone;
+            case "code":
+            default:          return R.drawable.ic_code;
+        }
     }
 }
