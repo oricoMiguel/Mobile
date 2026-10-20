@@ -10,8 +10,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class LoginActivity extends AppCompatActivity {
+import com.google.firebase.auth.FirebaseAuth;
 
+public class LoginActivity extends AppCompatActivity {
+    FirebaseAuth auth = FirebaseAuth.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,22 +33,37 @@ public class LoginActivity extends AppCompatActivity {
             String senha = edtSenha.getText().toString();
 
             if (email.isEmpty() || senha.isEmpty()) {
-                Toast.makeText(LoginActivity.this,
-                        "Preencha email e senha", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Preencha email e senha", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // TODO: validar o login (banco de dados ou API)
-
-            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-            finish();
+            btnEntrar.setEnabled(false);
+            auth.signInWithEmailAndPassword(email, senha)
+                    .addOnSuccessListener(r -> {
+                        startActivity(new Intent(this, HomeActivity.class));
+                        finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        btnEntrar.setEnabled(true);
+                        Toast.makeText(this, AuthErros.traduzir(e), Toast.LENGTH_LONG).show();
+                    });
         });
+
 
         btnCriarConta.setOnClickListener(v ->
                 startActivity(new Intent(LoginActivity.this, CadastroActivity.class)));
 
-        txtEsqueciSenha.setOnClickListener(v ->
-                Toast.makeText(LoginActivity.this,
-                        "Recuperação de senha em breve", Toast.LENGTH_SHORT).show());
+        txtEsqueciSenha.setOnClickListener(v -> {
+            String email = edtEmail.getText().toString().trim();
+            if (email.isEmpty()) {
+                Toast.makeText(this, "Digite seu email para recuperar a senha", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            auth.sendPasswordResetEmail(email)
+                    .addOnSuccessListener(x -> Toast.makeText(this,
+                            "Se o email existir, enviamos um link de recuperação", Toast.LENGTH_LONG).show())
+                    .addOnFailureListener(e -> Toast.makeText(this,
+                            AuthErros.traduzir(e), Toast.LENGTH_LONG).show());
+        });
     }
 }

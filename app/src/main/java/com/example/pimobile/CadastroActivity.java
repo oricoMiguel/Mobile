@@ -11,6 +11,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class CadastroActivity extends AppCompatActivity {
 
     @Override
@@ -31,21 +38,51 @@ public class CadastroActivity extends AppCompatActivity {
                 this, android.R.layout.simple_spinner_dropdown_item, tipos);
         spinner.setAdapter(adapter);
 
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
         btnEntrar.setOnClickListener(v -> {
             String nome = edtNome.getText().toString().trim();
             String email = edtEmail.getText().toString().trim();
             String senha = edtSenha.getText().toString();
+            String tipo = spinner.getSelectedItem().toString();
 
             if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
-                Toast.makeText(CadastroActivity.this,
-                        "Preencha todos os campos", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (senha.length() < 6) {
+                Toast.makeText(this, "A senha precisa ter pelo menos 6 caracteres", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // TODO: salvar/enviar os dados do cadastro (tipo, nome, email, senha)
+            btnEntrar.setEnabled(false);
 
-            startActivity(new Intent(CadastroActivity.this, HomeActivity.class));
-            finish();
+            auth.createUserWithEmailAndPassword(email, senha)
+                    .addOnSuccessListener(resultado -> {
+                        String uid = resultado.getUser().getUid();
+
+                        Map<String, Object> usuario = new HashMap<>();
+                        usuario.put("nome", nome);
+                        usuario.put("email", email);
+                        usuario.put("tipoConta", tipo);
+                        usuario.put("papel", "usuario");
+                        usuario.put("criadoEm", FieldValue.serverTimestamp());
+
+                        db.collection("usuarios").document(uid).set(usuario)
+                                .addOnSuccessListener(x -> {
+                                    startActivity(new Intent(this, HomeActivity.class));
+                                    finish();
+                                })
+                                .addOnFailureListener(e -> {
+                                    btnEntrar.setEnabled(true);
+                                    Toast.makeText(this, "Conta criada, mas falhou ao salvar o perfil", Toast.LENGTH_LONG).show();
+                                });
+                    })
+                    .addOnFailureListener(e -> {
+                        btnEntrar.setEnabled(true);
+                        Toast.makeText(this, AuthErros.traduzir(e), Toast.LENGTH_LONG).show();
+                    });
         });
 
         txtJaTenhoConta.setOnClickListener(v -> {

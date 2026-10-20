@@ -53,12 +53,9 @@
         <activity
             android:name=".RevisaoEquipeActivity"
             android:exported="false" />
-<<<<<<< HEAD
         <activity
             android:name=".PerfilActivity"
             android:exported="false" />
-=======
->>>>>>> 73e7dd831875419689e5468d30ed2d9f5728f246
     </application>
 
 </manifest>

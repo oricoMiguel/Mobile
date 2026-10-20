@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class PerfilActivity extends AppCompatActivity {
 
     @Override
@@ -33,7 +35,7 @@ public class PerfilActivity extends AppCompatActivity {
         findViewById(R.id.btnEditar).setOnClickListener(v -> emBreve());
 
         findViewById(R.id.btnLogout).setOnClickListener(v -> {
-            // TODO: FirebaseAuth.getInstance().signOut();
+            FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
