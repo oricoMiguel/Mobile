@@ -2,6 +2,7 @@ package com.example.pimobile;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -19,6 +20,7 @@ import java.util.List;
 public class MontarEquipeActivity extends AppCompatActivity {
 
     private static class PodOpcao {
+        final String id;
         final String nome;
         final String descricao;
         final int pessoas;
@@ -26,7 +28,9 @@ public class MontarEquipeActivity extends AppCompatActivity {
         final int iconeRes;
         final int fundoRes;
 
-        PodOpcao(String nome, String descricao, int pessoas, boolean digital, int iconeRes, int fundoRes) {
+        PodOpcao(String id, String nome, String descricao, int pessoas, boolean digital,
+                 int iconeRes, int fundoRes) {
+            this.id = id;
             this.nome = nome;
             this.descricao = descricao;
             this.pessoas = pessoas;
@@ -35,6 +39,8 @@ public class MontarEquipeActivity extends AppCompatActivity {
             this.fundoRes = fundoRes;
         }
     }
+
+    private final int[] fundoIcone = {R.drawable.bg_icone_roxo, R.drawable.bg_icone_verde, R.drawable.bg_icone_laranja};
 
     private final List<PodOpcao> todosPods = new ArrayList<>();
 
@@ -92,17 +98,39 @@ public class MontarEquipeActivity extends AppCompatActivity {
     }
 
     private void carregarPods() {
-        // TODO: buscar estes pods do mesmo lugar que a tela Skill Pods (banco de dados ou API)
-        todosPods.add(new PodOpcao("Desenvolvimento web", "Front-end, back-end e QA · 3 pessoas",
-                3, true, R.drawable.ic_code, R.drawable.bg_icone_roxo));
-        todosPods.add(new PodOpcao("Design e UX", "UI, pesquisa e protótipo · 2 pessoas",
-                2, true, R.drawable.ic_palette, R.drawable.bg_icone_verde));
-        todosPods.add(new PodOpcao("Marketing digital", "Conteúdo, tráfego e social · 3 pessoas",
-                3, true, R.drawable.ic_megaphone, R.drawable.bg_icone_laranja));
-        todosPods.add(new PodOpcao("Desenvolvimento local", "Equipe no seu endereço · 3 pessoas",
-                3, false, R.drawable.ic_code, R.drawable.bg_icone_roxo));
-        todosPods.add(new PodOpcao("Design presencial", "Workshops e prototipação · 2 pessoas",
-                2, false, R.drawable.ic_palette, R.drawable.bg_icone_verde));
+        SkillPodRepository.getTodos(new Callback<List<SkillPod>>() {
+            @Override
+            public void onSucesso(List<SkillPod> pods) {
+                if (isFinishing() || isDestroyed()) return;
+
+                todosPods.clear();
+                for (SkillPod pod : pods) {
+                    todosPods.add(new PodOpcao(
+                            pod.getId(),
+                            pod.getNome(),
+                            montarDescricao(pod),
+                            pod.getTotalPessoas(),
+                            pod.isDigital(),
+                            pod.getIconeRes(),
+                            fundoIcone[pod.getCor()]));
+                }
+                podSelecionado = null;
+                atualizarTela();
+            }
+
+            @Override
+            public void onErro(Exception e) {
+                if (isFinishing() || isDestroyed()) return;
+                Toast.makeText(MontarEquipeActivity.this,
+                        "Não foi possível carregar os Skill Pods", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private String montarDescricao(SkillPod pod) {
+        String tags = TextUtils.join(", ", pod.getTags());
+        String pessoas = pod.getTotalPessoas() + " pessoas";
+        return tags.isEmpty() ? pessoas : tags + " · " + pessoas;
     }
 
     private void escolherFormato(boolean skillPods) {
@@ -207,6 +235,7 @@ public class MontarEquipeActivity extends AppCompatActivity {
         }
 
         Intent intent = new Intent(this, RevisaoEquipeActivity.class);
+        intent.putExtra("pod_id", podSelecionado.id);
         intent.putExtra("pod_nome", podSelecionado.nome);
         intent.putExtra("pod_descricao", podSelecionado.descricao);
         intent.putExtra("pod_pessoas", podSelecionado.pessoas);

@@ -5,6 +5,7 @@ import java.util.List;
 public class SkillPod {
 
     // Cor do card: 0 = roxo, 1 = verde, 2 = laranja
+    private final String id;
     private final String nome;
     private final String descricao;
     private final boolean digital;
@@ -14,8 +15,9 @@ public class SkillPod {
     private final int iconeRes;
     private final int cor;
 
-    public SkillPod(String nome, String descricao, boolean digital, List<String> tags,
+    public SkillPod(String id, String nome, String descricao, boolean digital, List<String> tags,
                     List<String> membros, int totalPessoas, int iconeRes, int cor) {
+        this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.digital = digital;
@@ -26,6 +28,7 @@ public class SkillPod {
         this.cor = cor;
     }
 
+    public String getId() { return id; }
     public String getNome() { return nome; }
     public String getDescricao() { return descricao; }
     public boolean isDigital() { return digital; }

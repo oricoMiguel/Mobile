@@ -1,5 +1,6 @@
 package com.example.pimobile;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -46,7 +47,7 @@ public class ServicoActivity extends AppCompatActivity {
         txtVazio = findViewById(R.id.txtVazio);
         EditText edtBusca = findViewById(R.id.edtBusca);
 
-        todos = FreelancerRepository.getTodos();
+        todos = new ArrayList<>();
 
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
         findViewById(R.id.btnFiltro).setOnClickListener(v ->
@@ -64,7 +65,23 @@ public class ServicoActivity extends AppCompatActivity {
         });
 
         renderizarCategorias();
-        renderizarFreelancers();
+
+        FreelancerRepository.getTodos(new Callback<List<Freelancer>>() {
+            @Override
+            public void onSucesso(List<Freelancer> freelancers) {
+                if (isFinishing() || isDestroyed()) return;
+                todos = freelancers;
+                renderizarCategorias();
+                renderizarFreelancers();
+            }
+
+            @Override
+            public void onErro(Exception e) {
+                if (isFinishing() || isDestroyed()) return;
+                Toast.makeText(ServicoActivity.this,
+                        "Não foi possível carregar os freelancers", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void renderizarCategorias() {
@@ -88,7 +105,7 @@ public class ServicoActivity extends AppCompatActivity {
             chip.setBackgroundResource(ativo ? R.drawable.bg_chip_filtro_ativo : R.drawable.bg_chip_filtro);
             chip.setTextColor(ContextCompat.getColor(this, ativo ? R.color.branco : R.color.eq_escuro));
             if (ativo) {
-                chip.setTypeface(chip.getTypeface(), android.graphics.Typeface.BOLD);
+                chip.setTypeface(chip.getTypeface(), Typeface.BOLD);
             }
 
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(

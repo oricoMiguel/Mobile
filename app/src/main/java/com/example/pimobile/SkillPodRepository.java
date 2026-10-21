@@ -55,6 +55,7 @@ public class SkillPodRepository {
         int corIndice = cor == null ? 0 : Math.max(0, Math.min(2, cor.intValue()));
 
         return new SkillPod(
+                doc.getId(),
                 nome == null ? "Sem nome" : nome,
                 descricao == null ? "" : descricao,
                 digital,

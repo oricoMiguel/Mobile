@@ -38,6 +38,25 @@ public class SeedDados {
                 .addOnFailureListener(e -> Log.e("Seed", "falha ao gravar skillPods", e));
     }
 
+    public static void freelancers() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        WriteBatch batch = db.batch();
+
+        freelancer(batch, db, "exemplo-ana-souza", "Ana Souza", "Desenvolvedora front-end",
+                "Desenvolvimento", 4.9, Arrays.asList("React", "JavaScript", "CSS"),
+                true, "Disponível agora");
+        freelancer(batch, db, "exemplo-carlos-lima", "Carlos Lima", "Designer UI/UX",
+                "Design", 4.7, Arrays.asList("Figma", "Protótipo", "Pesquisa"),
+                true, "Disponível agora");
+        freelancer(batch, db, "exemplo-julia-martins", "Julia Martins", "Marketing digital",
+                "Marketing", 4.8, Arrays.asList("Conteúdo", "Tráfego pago"),
+                false, "Livre a partir de segunda");
+
+        batch.commit()
+                .addOnSuccessListener(x -> Log.d("Seed", "freelancers gravados"))
+                .addOnFailureListener(e -> Log.e("Seed", "falha ao gravar freelancers", e));
+    }
+
     private static void pod(WriteBatch batch, FirebaseFirestore db, String id, String nome,
                             String descricao, boolean digital, List<String> tags,
                             List<String> membros, int totalPessoas, String icone,
@@ -53,5 +72,20 @@ public class SeedDados {
         dados.put("cor", cor);
         dados.put("ordem", ordem);
         batch.set(db.collection("skillPods").document(id), dados);
+    }
+
+    private static void freelancer(WriteBatch batch, FirebaseFirestore db, String id,
+                                   String nome, String area, String categoria, double nota,
+                                   List<String> habilidades, boolean disponivel,
+                                   String disponibilidade) {
+        Map<String, Object> dados = new HashMap<>();
+        dados.put("nome", nome);
+        dados.put("area", area);
+        dados.put("categoria", categoria);
+        dados.put("nota", nota);
+        dados.put("habilidades", habilidades);
+        dados.put("disponivel", disponivel);
+        dados.put("disponibilidade", disponibilidade);
+        batch.set(db.collection("freelancers").document(id), dados);
     }
 }

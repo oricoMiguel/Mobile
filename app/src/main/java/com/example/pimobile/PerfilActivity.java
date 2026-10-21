@@ -65,16 +65,17 @@ public class PerfilActivity extends AppCompatActivity {
         LinearLayout lista = findViewById(R.id.listaOpcoes);
         lista.removeAllViews();
 
-        adicionar(lista, R.drawable.ic_person, "Meu perfil", 0);
-        adicionar(lista, R.drawable.ic_briefcase, "Meus projetos", 0);
-        adicionar(lista, R.drawable.ic_pods, "Minhas equipes", 0);
-        adicionar(lista, R.drawable.ic_mail, "Mensagens", mensagensNaoLidas);
-        adicionar(lista, R.drawable.ic_bell, "Notificações", 0);
-        adicionar(lista, R.drawable.ic_settings, "Configurações", 0);
-        adicionar(lista, R.drawable.ic_doc, "Termos e privacidade", 0);
+        adicionar(lista, R.drawable.ic_person, "Meu perfil", 0, null);
+        adicionar(lista, R.drawable.ic_briefcase, "Meus projetos", 0, null);
+        adicionar(lista, R.drawable.ic_pods, "Minhas equipes", 0, MinhasEquipesActivity.class);
+        adicionar(lista, R.drawable.ic_mail, "Mensagens", mensagensNaoLidas, null);
+        adicionar(lista, R.drawable.ic_bell, "Notificações", 0, null);
+        adicionar(lista, R.drawable.ic_settings, "Configurações", 0, null);
+        adicionar(lista, R.drawable.ic_doc, "Termos e privacidade", 0, null);
     }
 
-    private void adicionar(LinearLayout lista, int iconeRes, String titulo, int contador) {
+    private void adicionar(LinearLayout lista, int iconeRes, String titulo, int contador,
+                           Class<?> destino) {
         View item = LayoutInflater.from(this).inflate(R.layout.item_perfil_opcao, lista, false);
 
         ImageView icone = item.findViewById(R.id.imgIcone);
@@ -89,8 +90,13 @@ public class PerfilActivity extends AppCompatActivity {
             txtContador.setVisibility(View.VISIBLE);
         }
 
-        // TODO: cada opção vai abrir a sua tela quando ela existir
-        item.setOnClickListener(v -> emBreve());
+        item.setOnClickListener(v -> {
+            if (destino == null) {
+                emBreve();
+            } else {
+                startActivity(new Intent(this, destino));
+            }
+        });
         lista.addView(item);
     }
 
