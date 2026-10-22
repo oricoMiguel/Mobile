@@ -8,13 +8,13 @@ public class AreaUsuarioActivity extends AreaAdmBaseActivity {
     @Override protected String dicaBusca() { return "Buscar por nome ou email"; }
 
     @Override
-    protected List<RegistroAdm> carregarRegistros() {
-        return AreaAdmRepository.getUsuarios();
+    protected void carregarRegistros(Callback<List<RegistroAdm>> callback) {
+        AreaAdmRepository.getUsuarios(callback);
     }
 
     @Override
     protected String[] rotulosCards() {
-        return new String[]{"Total de usuários", "Ativos", "Pendentes", "Inativos"};
+        return new String[]{"Total de usuários", "Freelancers", "Usuários", "Admins"};
     }
 
     @Override
@@ -22,8 +22,8 @@ public class AreaUsuarioActivity extends AreaAdmBaseActivity {
         return new String[]{
                 String.valueOf(lista.size()),
                 String.valueOf(contar(lista, 0)),
-                String.valueOf(contar(lista, 1)),
-                String.valueOf(contar(lista, 2))
+                String.valueOf(contar(lista, 2)),
+                String.valueOf(contar(lista, 1))
         };
     }
 }

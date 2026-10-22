@@ -14,3 +14,11 @@
 .cxx
 local.properties
 app/google-services.json
+
+# Arquivos locais e configuracao Firebase
+google-services.json
+**/google-services.json
+local.properties
+.gradle/
+**/build/
+.idea/

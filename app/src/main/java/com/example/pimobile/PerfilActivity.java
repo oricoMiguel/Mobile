@@ -69,7 +69,7 @@ public class PerfilActivity extends AppCompatActivity {
         adicionar(lista, R.drawable.ic_briefcase, "Meus projetos", 0, null);
         adicionar(lista, R.drawable.ic_pods, "Minhas equipes", 0, MinhasEquipesActivity.class);
         adicionar(lista, R.drawable.ic_mail, "Mensagens", mensagensNaoLidas, null);
-        adicionar(lista, R.drawable.ic_bell, "Notificações", 0, null);
+        adicionar(lista, R.drawable.ic_bell, "Notificações", 0, NotificacoesActivity.class);
         adicionar(lista, R.drawable.ic_settings, "Configurações", 0, null);
         adicionar(lista, R.drawable.ic_doc, "Termos e privacidade", 0, null);
     }

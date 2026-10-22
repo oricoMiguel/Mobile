@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -23,7 +24,7 @@ public abstract class AreaAdmBaseActivity extends AppCompatActivity {
     private final int[] fundoBadge = {R.drawable.bg_tag_verde, R.drawable.bg_tag_laranja, R.drawable.bg_tag_cinza};
     private final int[] corBadge = {R.color.texto_verde, R.color.laranja_icone, R.color.eq_texto_claro};
 
-    private List<RegistroAdm> todos;
+    private List<RegistroAdm> todos = new ArrayList<>();
     private String textoBusca = "";
     private LinearLayout listaRegistros;
     private TextView txtVazio;
@@ -31,9 +32,14 @@ public abstract class AreaAdmBaseActivity extends AppCompatActivity {
     // Cada área informa o que é diferente:
     protected abstract String tituloLista();
     protected abstract String dicaBusca();
-    protected abstract List<RegistroAdm> carregarRegistros();
+    protected abstract void carregarRegistros(Callback<List<RegistroAdm>> callback);
     protected abstract String[] rotulosCards();                        // 4 rótulos
     protected abstract String[] valoresCards(List<RegistroAdm> lista); // 4 valores
+
+    // Quem quiser uma ação ao tocar no registro sobrescreve este método
+    protected void aoClicar(RegistroAdm registro) {
+        Toast.makeText(this, registro.getNome(), Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +55,6 @@ public abstract class AreaAdmBaseActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.txtTituloLista)).setText(tituloLista());
         edtBusca.setHint(dicaBusca());
 
-        todos = carregarRegistros();
-        preencherCards();
-
         findViewById(R.id.btnFiltro).setOnClickListener(v ->
                 Toast.makeText(this, "Filtros em breve", Toast.LENGTH_SHORT).show());
 
@@ -66,7 +69,36 @@ public abstract class AreaAdmBaseActivity extends AppCompatActivity {
             }
         });
 
-        renderizarLista();
+        carregar();
+    }
+
+    protected void recarregar() {
+        carregar();
+    }
+
+    private void carregar() {
+        carregarRegistros(new Callback<List<RegistroAdm>>() {
+            @Override
+            public void onSucesso(List<RegistroAdm> lista) {
+                if (isFinishing() || isDestroyed()) return;
+                todos = lista;
+                preencherCards();
+                renderizarLista();
+            }
+
+            @Override
+            public void onErro(Exception e) {
+                if (isFinishing() || isDestroyed()) return;
+                if (AdmRepository.permissaoNegada(e)) {
+                    Toast.makeText(AreaAdmBaseActivity.this,
+                            "Acesso restrito a administradores", Toast.LENGTH_LONG).show();
+                    finish();
+                } else {
+                    Toast.makeText(AreaAdmBaseActivity.this,
+                            "Não foi possível carregar os dados", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     private void preencherCards() {
@@ -110,10 +142,7 @@ public abstract class AreaAdmBaseActivity extends AppCompatActivity {
             txtBadge.setBackgroundResource(fundoBadge[r.getBadgeTipo()]);
             txtBadge.setTextColor(ContextCompat.getColor(this, corBadge[r.getBadgeTipo()]));
 
-            item.setOnClickListener(v -> {
-                // TODO: abrir os detalhes do registro
-                Toast.makeText(this, r.getNome(), Toast.LENGTH_SHORT).show();
-            });
+            item.setOnClickListener(v -> aoClicar(r));
 
             listaRegistros.addView(item);
         }

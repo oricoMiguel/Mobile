@@ -39,10 +39,9 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(new Intent(HomeActivity.this, SkillPodsActivity.class)));
 
         findViewById(R.id.btnNotificacoes).setOnClickListener(v ->
-                Toast.makeText(HomeActivity.this, "Sem notificações", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(HomeActivity.this, NotificacoesActivity.class)));
 
         configurarVideo();
-
         carregarSkillPodsPopulares();
     }
 
@@ -73,6 +72,23 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
         VideoView videoView = findViewById(R.id.videoEmpresa);
         videoView.start();
+        atualizarAvisoNotificacoes();
+    }
+
+    private void atualizarAvisoNotificacoes() {
+        NotificacaoRepository.contarNaoLidas(new Callback<Integer>() {
+            @Override
+            public void onSucesso(Integer naoLidas) {
+                if (isFinishing() || isDestroyed()) return;
+                findViewById(R.id.dotNotificacoes)
+                        .setVisibility(naoLidas > 0 ? View.VISIBLE : View.GONE);
+            }
+
+            @Override
+            public void onErro(Exception e) {
+                // Sem o aviso, a Home continua funcionando normalmente
+            }
+        });
     }
 
     private void carregarSkillPodsPopulares() {

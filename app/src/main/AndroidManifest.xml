@@ -59,6 +59,12 @@
         <activity
             android:name=".MinhasEquipesActivity"
             android:exported="false" />
+        <activity
+            android:name=".AreaEquipesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".NotificacoesActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

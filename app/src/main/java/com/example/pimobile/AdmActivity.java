@@ -26,33 +26,46 @@ public class AdmActivity extends AppCompatActivity {
         findViewById(R.id.btnNotificacoes).setOnClickListener(v ->
                 Toast.makeText(this, "Sem notificações", Toast.LENGTH_SHORT).show());
 
-        List<AreaAdm> areas = AdmRepository.getAreas();
-        carregarAlerta(areas);
-        carregarAreas(areas);
+        // O alerta só aparece quando houver algo para revisar
+        findViewById(R.id.cardAlerta).setVisibility(View.GONE);
+
+        AdmRepository.getAreas(new Callback<List<AreaAdm>>() {
+            @Override
+            public void onSucesso(List<AreaAdm> areas) {
+                if (isFinishing() || isDestroyed()) return;
+                carregarAlerta(areas);
+                carregarAreas(areas);
+            }
+
+            @Override
+            public void onErro(Exception e) {
+                if (isFinishing() || isDestroyed()) return;
+                if (AdmRepository.permissaoNegada(e)) {
+                    Toast.makeText(AdmActivity.this,
+                            "Acesso restrito a administradores", Toast.LENGTH_LONG).show();
+                    finish();
+                } else {
+                    Toast.makeText(AdmActivity.this,
+                            "Não foi possível carregar o painel", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     private void carregarAlerta(List<AreaAdm> areas) {
         int totalPendentes = 0;
-        int usuariosPendentes = 0;
-        int freelancersPendentes = 0;
-
         for (AreaAdm area : areas) {
             totalPendentes += area.getPendentes();
-            if (area.getDestino() == AreaUsuarioActivity.class) {
-                usuariosPendentes = area.getPendentes();
-            } else if (area.getDestino() == AreaFreelancerActivity.class) {
-                freelancersPendentes = area.getPendentes();
-            }
         }
 
-        ((TextView) findViewById(R.id.txtAlertaTitulo))
-                .setText(totalPendentes + " itens para revisar");
-        ((TextView) findViewById(R.id.txtAlertaDetalhe))
-                .setText(usuariosPendentes + " usuários e " + freelancersPendentes
-                        + " freelancers pendentes");
+        ((TextView) findViewById(R.id.txtAlertaTitulo)).setText(totalPendentes
+                + (totalPendentes == 1 ? " item para revisar" : " itens para revisar"));
+        ((TextView) findViewById(R.id.txtAlertaDetalhe)).setText(totalPendentes
+                + (totalPendentes == 1 ? " equipe aguardando aprovação"
+                : " equipes aguardando aprovação"));
 
         View.OnClickListener revisar = v ->
-                startActivity(new Intent(this, AreaUsuarioActivity.class));
+                startActivity(new Intent(this, AreaEquipesActivity.class));
         findViewById(R.id.btnRevisar).setOnClickListener(revisar);
         findViewById(R.id.cardAlerta).setOnClickListener(revisar);
 

@@ -38,13 +38,28 @@
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/btnNotificacoes"
+            <FrameLayout
                 android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:contentDescription="Notificações"
-                android:padding="6dp"
-                android:src="@drawable/ic_bell" />
+                android:layout_height="36dp">
+
+                <ImageView
+                    android:id="@+id/btnNotificacoes"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:contentDescription="Notificações"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_bell" />
+
+                <View
+                    android:id="@+id/dotNotificacoes"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_dot_laranja"
+                    android:visibility="gone" />
+            </FrameLayout>
 
             <ImageView
                 android:id="@+id/btnMenu"

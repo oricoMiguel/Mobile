@@ -1,6 +1,5 @@
 package com.example.pimobile;
 
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -10,29 +9,31 @@ public class AreaFreelancerActivity extends AreaAdmBaseActivity {
     @Override protected String dicaBusca() { return "Buscar por nome ou especialidade"; }
 
     @Override
-    protected List<RegistroAdm> carregarRegistros() {
-        return AreaAdmRepository.getFreelancers();
+    protected void carregarRegistros(Callback<List<RegistroAdm>> callback) {
+        AreaAdmRepository.getFreelancers(callback);
     }
 
     @Override
     protected String[] rotulosCards() {
-        return new String[]{"Total de freelancers", "Disponíveis", "Em projeto", "Faturamento"};
+        return new String[]{"Total de freelancers", "Disponíveis", "Indisponíveis", "Nota média"};
     }
 
     @Override
     protected String[] valoresCards(List<RegistroAdm> lista) {
-        double faturamento = 0;
-        for (RegistroAdm r : lista) {
-            faturamento += r.getValor();
+        String media = "–";
+        if (!lista.isEmpty()) {
+            double soma = 0;
+            for (RegistroAdm r : lista) {
+                soma += r.getValor();
+            }
+            media = String.format(new Locale("pt", "BR"), "%.1f", soma / lista.size());
         }
-        NumberFormat moeda = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
-        moeda.setMaximumFractionDigits(0);
 
         return new String[]{
                 String.valueOf(lista.size()),
                 String.valueOf(contar(lista, 0)),
                 String.valueOf(contar(lista, 1)),
-                moeda.format(faturamento)
+                media
         };
     }
 }
