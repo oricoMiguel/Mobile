@@ -10,13 +10,15 @@ public class SkillPod {
     private final String descricao;
     private final boolean digital;
     private final List<String> tags;
-    private final List<String> membros; // iniciais dos membros
+    private final List<String> membros; // iniciais, para os avatares da lista
     private final int totalPessoas;
     private final int iconeRes;
     private final int cor;
+    private final List<Membro> integrantes; // membros reais (uid + nome)
 
     public SkillPod(String id, String nome, String descricao, boolean digital, List<String> tags,
-                    List<String> membros, int totalPessoas, int iconeRes, int cor) {
+                    List<String> membros, int totalPessoas, int iconeRes, int cor,
+                    List<Membro> integrantes) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
@@ -26,6 +28,7 @@ public class SkillPod {
         this.totalPessoas = totalPessoas;
         this.iconeRes = iconeRes;
         this.cor = cor;
+        this.integrantes = integrantes;
     }
 
     public String getId() { return id; }
@@ -37,4 +40,5 @@ public class SkillPod {
     public int getTotalPessoas() { return totalPessoas; }
     public int getIconeRes() { return iconeRes; }
     public int getCor() { return cor; }
+    public List<Membro> getIntegrantes() { return integrantes; }
 }

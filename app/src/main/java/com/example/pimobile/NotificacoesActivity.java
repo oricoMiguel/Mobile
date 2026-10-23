@@ -83,7 +83,14 @@ public class NotificacoesActivity extends AppCompatActivity {
                     NotificacaoRepository.marcarComoLida(aviso.getId());
                     aplicarEstado(card, aviso);
                 }
-                startActivity(new Intent(this, MinhasEquipesActivity.class));
+                Class<?> destino;
+                if ("perfil".equals(aviso.getTipo())) {
+                    destino = EditarPerfilActivity.class;
+                } else if ("pod".equals(aviso.getTipo())) {
+                    destino = SkillPodsActivity.class;
+                } else {
+                    destino = MinhasEquipesActivity.class;
+                }
             });
 
             listaNotificacoes.addView(card);

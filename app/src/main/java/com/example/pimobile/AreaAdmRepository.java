@@ -18,6 +18,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.WriteBatch;
 
+import com.google.firebase.firestore.FirebaseFirestoreException;
+
 
 public class AreaAdmRepository {
 
@@ -66,37 +68,198 @@ public class AreaAdmRepository {
 
     // ---------- Freelancers ----------
     // subtitulo = área | detalhe = nota e disponibilidade | valor = nota
+    // ---------- Freelancers ----------
+    // subtitulo = área | detalhe = nota, categoria e disponibilidade | badge = status do perfil
     public static void getFreelancers(Callback<List<RegistroAdm>> callback) {
         FirebaseFirestore.getInstance().collection("freelancers")
-                .orderBy("nome")
                 .get()
                 .addOnSuccessListener(query -> {
+                    List<DocumentSnapshot> docs = new ArrayList<>(query.getDocuments());
+
+                    // Pendentes primeiro; dentro de cada grupo, ordem alfabética
+                    Collections.sort(docs, (a, b) -> {
+                        boolean pa = "pendente".equals(a.getString("status"));
+                        boolean pb = "pendente".equals(b.getString("status"));
+                        if (pa != pb) return pa ? -1 : 1;
+                        String na = a.getString("nome") == null ? "" : a.getString("nome");
+                        String nb = b.getString("nome") == null ? "" : b.getString("nome");
+                        return na.compareToIgnoreCase(nb);
+                    });
+
                     List<RegistroAdm> lista = new ArrayList<>();
 
-                    for (DocumentSnapshot doc : query.getDocuments()) {
+                    for (DocumentSnapshot doc : docs) {
                         String nome = doc.getString("nome");
                         String area = doc.getString("area");
                         String categoria = doc.getString("categoria");
+                        String status = doc.getString("status");
                         Double nota = doc.getDouble("nota");
                         boolean disponivel = Boolean.TRUE.equals(doc.getBoolean("disponivel"));
-                        String disponibilidade = doc.getString("disponibilidade");
 
                         double notaValor = nota == null ? 0 : nota;
-                        String detalhe = "★ " + String.format(BR, "%.1f", notaValor)
-                                + (disponibilidade == null ? "" : " · " + disponibilidade);
+                        String detalhe = (notaValor > 0
+                                ? "★ " + String.format(BR, "%.1f", notaValor) : "Novo")
+                                + " · " + (categoria == null ? "Outros" : categoria)
+                                + " · " + (disponivel ? "Disponível" : "Indisponível");
+
+                        String badge;
+                        int badgeTipo;
+                        if ("aprovado".equals(status)) {
+                            badge = "Aprovado";
+                            badgeTipo = 0;
+                        } else if ("recusado".equals(status)) {
+                            badge = "Recusado";
+                            badgeTipo = 2;
+                        } else {
+                            badge = "Pendente";
+                            badgeTipo = 1;
+                        }
 
                         lista.add(new RegistroAdm(
                                 doc.getId(),
                                 nome == null ? "Sem nome" : nome,
                                 area == null ? "" : area,
                                 detalhe,
-                                disponivel ? "Disponível" : "Indisponível",
-                                disponivel ? 0 : 1,
+                                badge,
+                                badgeTipo,
                                 corPorCategoria(categoria == null ? "Outros" : categoria),
                                 notaValor));
                     }
                     callback.onSucesso(lista);
                 })
+                .addOnFailureListener(callback::onErro);
+    }
+
+    // ---------- Pedidos para entrar em skill pods ----------
+    // nome = freelancer | subtitulo = pod pedido | detalhe = data
+    public static void getParticipacoes(Callback<List<RegistroAdm>> callback) {
+        FirebaseFirestore.getInstance().collection("participacoes")
+                .get()
+                .addOnSuccessListener(query -> {
+                    List<DocumentSnapshot> docs = new ArrayList<>(query.getDocuments());
+
+                    // Pendentes primeiro; dentro de cada grupo, os mais recentes
+                    Collections.sort(docs, (a, b) -> {
+                        boolean pa = "pendente".equals(a.getString("status"));
+                        boolean pb = "pendente".equals(b.getString("status"));
+                        if (pa != pb) return pa ? -1 : 1;
+                        return Long.compare(millis(b.getTimestamp("criadoEm")),
+                                millis(a.getTimestamp("criadoEm")));
+                    });
+
+                    SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy", BR);
+                    List<RegistroAdm> lista = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : docs) {
+                        String nome = doc.getString("nome");
+                        String podNome = doc.getString("podNome");
+                        String status = doc.getString("status");
+                        Timestamp criadoEm = doc.getTimestamp("criadoEm");
+
+                        String badge;
+                        int badgeTipo;
+                        if ("aprovada".equals(status)) {
+                            badge = "Aprovada";
+                            badgeTipo = 0;
+                        } else if ("recusada".equals(status)) {
+                            badge = "Recusada";
+                            badgeTipo = 2;
+                        } else {
+                            badge = "Pendente";
+                            badgeTipo = 1;
+                        }
+
+                        lista.add(new RegistroAdm(
+                                doc.getId(),
+                                nome == null ? "Sem nome" : nome,
+                                "Quer entrar em: " + (podNome == null ? "pod" : podNome),
+                                criadoEm == null ? "Sem data"
+                                        : "Pedido em " + formato.format(criadoEm.toDate()),
+                                badge,
+                                badgeTipo,
+                                corPorId(doc.getId()),
+                                0));
+                    }
+                    callback.onSucesso(lista);
+                })
+                .addOnFailureListener(callback::onErro);
+    }
+
+    // status: "aprovada" ou "recusada".
+    // Ao aprovar, numa única transação: o pedido muda de status, o freelancer entra na
+    // lista de membros do pod, o total de pessoas sobe 1 e ele recebe um aviso.
+    public static void atualizarStatusParticipacao(String participacaoId, String status,
+                                                   Callback<Void> callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference ref = db.collection("participacoes").document(participacaoId);
+        boolean aprovada = "aprovada".equals(status);
+
+        db.runTransaction(transacao -> {
+                    DocumentSnapshot pedido = transacao.get(ref);
+
+                    // Evita contar duas vezes se outro admin já decidiu
+                    if (!"pendente".equals(pedido.getString("status"))) {
+                        throw new FirebaseFirestoreException("Este pedido já foi decidido",
+                                FirebaseFirestoreException.Code.FAILED_PRECONDITION);
+                    }
+
+                    String podId = pedido.getString("podId");
+                    String podNome = pedido.getString("podNome");
+                    String usuarioId = pedido.getString("usuarioId");
+                    String nome = pedido.getString("nome");
+
+                    if (aprovada) {
+                        Map<String, Object> membro = new HashMap<>();
+                        membro.put("uid", usuarioId);
+                        membro.put("nome", nome);
+
+                        transacao.update(db.collection("skillPods").document(podId),
+                                "membros", FieldValue.arrayUnion(membro),
+                                "totalPessoas", FieldValue.increment(1));
+                    }
+
+                    transacao.update(ref, "status", status);
+
+                    Map<String, Object> aviso = new HashMap<>();
+                    aviso.put("usuarioId", usuarioId);
+                    aviso.put("tipo", "pod");
+                    aviso.put("titulo", aprovada ? "Entrada no pod aprovada" : "Entrada no pod recusada");
+                    aviso.put("mensagem", aprovada
+                            ? "Você agora faz parte do " + (podNome == null ? "pod" : podNome) + "."
+                            : "Seu pedido para entrar no " + (podNome == null ? "pod" : podNome)
+                              + " não foi aprovado desta vez.");
+                    aviso.put("lida", false);
+                    aviso.put("criadoEm", FieldValue.serverTimestamp());
+                    transacao.set(db.collection("notificacoes").document(), aviso);
+
+                    return null;
+                })
+                .addOnSuccessListener(x -> callback.onSucesso(null))
+                .addOnFailureListener(callback::onErro);
+    }
+
+    // status: "aprovado" ou "recusado". O ID do perfil é o mesmo UID da conta do freelancer.
+    public static void atualizarStatusFreelancer(String freelancerId, String status,
+                                                 Callback<Void> callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        boolean aprovado = "aprovado".equals(status);
+
+        WriteBatch batch = db.batch();
+        batch.update(db.collection("freelancers").document(freelancerId), "status", status);
+
+        Map<String, Object> aviso = new HashMap<>();
+        aviso.put("usuarioId", freelancerId);
+        aviso.put("tipo", "perfil");
+        aviso.put("titulo", aprovado ? "Perfil aprovado" : "Perfil recusado");
+        aviso.put("mensagem", aprovado
+                ? "Seu perfil profissional foi aprovado e já aparece em Serviços."
+                : "Seu perfil profissional não foi aprovado. Ajuste as informações e envie de novo.");
+        aviso.put("lida", false);
+        aviso.put("criadoEm", FieldValue.serverTimestamp());
+        batch.set(db.collection("notificacoes").document(), aviso);
+
+        batch.commit()
+                .addOnSuccessListener(x -> callback.onSucesso(null))
                 .addOnFailureListener(callback::onErro);
     }
 

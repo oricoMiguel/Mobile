@@ -5,6 +5,7 @@ import java.util.List;
 public class Freelancer {
 
     // Cores do card: 0 = roxo, 1 = verde, 2 = laranja
+    private final String id;
     private final String nome;
     private final String area;
     private final String categoria;
@@ -13,10 +14,12 @@ public class Freelancer {
     private final boolean disponivel;
     private final String disponibilidade;
     private final int cor;
+    private final long criadoEm; // milissegundos; 0 se não houver data
 
-    public Freelancer(String nome, String area, String categoria, double nota,
+    public Freelancer(String id, String nome, String area, String categoria, double nota,
                       List<String> habilidades, boolean disponivel,
-                      String disponibilidade, int cor) {
+                      String disponibilidade, int cor, long criadoEm) {
+        this.id = id;
         this.nome = nome;
         this.area = area;
         this.categoria = categoria;
@@ -25,8 +28,10 @@ public class Freelancer {
         this.disponivel = disponivel;
         this.disponibilidade = disponibilidade;
         this.cor = cor;
+        this.criadoEm = criadoEm;
     }
 
+    public String getId() { return id; }
     public String getNome() { return nome; }
     public String getArea() { return area; }
     public String getCategoria() { return categoria; }
@@ -35,9 +40,12 @@ public class Freelancer {
     public boolean isDisponivel() { return disponivel; }
     public String getDisponibilidade() { return disponibilidade; }
     public int getCor() { return cor; }
+    public long getCriadoEm() { return criadoEm; }
 
     public String getIniciais() {
-        String[] partes = nome.trim().split("\\s+");
+        String limpo = nome == null ? "" : nome.trim();
+        if (limpo.isEmpty()) return "?";
+        String[] partes = limpo.split("\\s+");
         String primeira = partes[0].substring(0, 1);
         String ultima = partes.length > 1 ? partes[partes.length - 1].substring(0, 1) : "";
         return (primeira + ultima).toUpperCase();

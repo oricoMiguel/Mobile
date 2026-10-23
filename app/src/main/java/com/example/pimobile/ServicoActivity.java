@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import android.content.Intent;
+
 public class ServicoActivity extends AppCompatActivity {
 
     private static final String TODOS = "Todos";
@@ -176,8 +178,9 @@ public class ServicoActivity extends AppCompatActivity {
             }
 
             card.findViewById(R.id.btnVerPerfil).setOnClickListener(v -> {
-                // TODO: abrir a tela de perfil do freelancer
-                Toast.makeText(this, "Perfil de " + f.getNome(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, PerfilFreelancerActivity.class);
+                intent.putExtra("freelancer_id", f.getId());
+                startActivity(intent);
             });
 
             listaFreelancers.addView(card);

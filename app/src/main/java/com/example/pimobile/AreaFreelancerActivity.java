@@ -1,7 +1,10 @@
 package com.example.pimobile;
 
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+
 import java.util.List;
-import java.util.Locale;
 
 public class AreaFreelancerActivity extends AreaAdmBaseActivity {
 
@@ -15,25 +18,48 @@ public class AreaFreelancerActivity extends AreaAdmBaseActivity {
 
     @Override
     protected String[] rotulosCards() {
-        return new String[]{"Total de freelancers", "Disponíveis", "Indisponíveis", "Nota média"};
+        return new String[]{"Total de freelancers", "Pendentes", "Aprovados", "Recusados"};
     }
 
     @Override
     protected String[] valoresCards(List<RegistroAdm> lista) {
-        String media = "–";
-        if (!lista.isEmpty()) {
-            double soma = 0;
-            for (RegistroAdm r : lista) {
-                soma += r.getValor();
-            }
-            media = String.format(new Locale("pt", "BR"), "%.1f", soma / lista.size());
-        }
-
         return new String[]{
                 String.valueOf(lista.size()),
-                String.valueOf(contar(lista, 0)),
                 String.valueOf(contar(lista, 1)),
-                media
+                String.valueOf(contar(lista, 0)),
+                String.valueOf(contar(lista, 2))
         };
+    }
+
+    @Override
+    protected void aoClicar(RegistroAdm registro) {
+        new AlertDialog.Builder(this)
+                .setTitle(registro.getNome())
+                .setMessage(registro.getSubtitulo() + "\n" + registro.getDetalhe()
+                        + "\nStatus atual: " + registro.getBadge())
+                .setPositiveButton("Aprovar", (d, w) -> mudarStatus(registro, "aprovado"))
+                .setNegativeButton("Recusar", (d, w) -> mudarStatus(registro, "recusado"))
+                .setNeutralButton("Cancelar", null)
+                .show();
+    }
+
+    private void mudarStatus(RegistroAdm registro, String status) {
+        AreaAdmRepository.atualizarStatusFreelancer(registro.getId(), status, new Callback<Void>() {
+            @Override
+            public void onSucesso(Void resultado) {
+                if (isFinishing() || isDestroyed()) return;
+                Toast.makeText(AreaFreelancerActivity.this,
+                        "Perfil " + ("aprovado".equals(status) ? "aprovado" : "recusado"),
+                        Toast.LENGTH_SHORT).show();
+                recarregar();
+            }
+
+            @Override
+            public void onErro(Exception e) {
+                if (isFinishing() || isDestroyed()) return;
+                Toast.makeText(AreaFreelancerActivity.this,
+                        "Não foi possível atualizar o perfil", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

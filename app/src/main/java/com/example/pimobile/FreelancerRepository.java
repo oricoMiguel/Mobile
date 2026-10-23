@@ -1,5 +1,6 @@
 package com.example.pimobile;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -30,6 +31,21 @@ public class FreelancerRepository {
                     }
                     Collections.sort(lista, (a, b) -> a.getNome().compareToIgnoreCase(b.getNome()));
                     callback.onSucesso(lista);
+                })
+                .addOnFailureListener(callback::onErro);
+    }
+
+    // Um freelancer pelo ID do documento (usado na tela "Ver perfil")
+    public static void getPorId(String id, Callback<Freelancer> callback) {
+        FirebaseFirestore.getInstance().collection(COLECAO)
+                .document(id)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
+                        callback.onErro(new IllegalStateException("Perfil não encontrado"));
+                        return;
+                    }
+                    callback.onSucesso(paraFreelancer(doc));
                 })
                 .addOnFailureListener(callback::onErro);
     }
@@ -137,7 +153,10 @@ public class FreelancerRepository {
             disponibilidade = disponivel ? "Disponível agora" : "Indisponível";
         }
 
+        Timestamp criadoEm = doc.getTimestamp("criadoEm");
+
         return new Freelancer(
+                doc.getId(),
                 nome,
                 area,
                 categoria,
@@ -145,7 +164,8 @@ public class FreelancerRepository {
                 listaDeTexto(doc.get("habilidades")),
                 disponivel,
                 disponibilidade,
-                corPorCategoria(categoria));
+                corPorCategoria(categoria),
+                criadoEm == null ? 0 : criadoEm.toDate().getTime());
     }
 
     private static List<String> listaDeTexto(Object valor) {

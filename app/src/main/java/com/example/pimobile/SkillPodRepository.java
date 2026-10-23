@@ -6,6 +6,7 @@ import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SkillPodRepository {
 
@@ -45,6 +46,20 @@ public class SkillPodRepository {
                 .addOnFailureListener(callback::onErro);
     }
 
+    public static void getPorId(String id, Callback<SkillPod> callback) {
+        FirebaseFirestore.getInstance().collection(COLECAO)
+                .document(id)
+                .get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) {
+                        callback.onErro(new IllegalStateException("Skill pod não encontrado"));
+                        return;
+                    }
+                    callback.onSucesso(paraSkillPod(doc));
+                })
+                .addOnFailureListener(callback::onErro);
+    }
+
     private static SkillPod paraSkillPod(DocumentSnapshot doc) {
         String nome = doc.getString("nome");
         String descricao = doc.getString("descricao");
@@ -54,16 +69,43 @@ public class SkillPodRepository {
         Long cor = doc.getLong("cor");
         int corIndice = cor == null ? 0 : Math.max(0, Math.min(2, cor.intValue()));
 
+        List<Membro> integrantes = lerIntegrantes(doc.get("membros"));
+        List<String> iniciais = new ArrayList<>();
+        for (Membro m : integrantes) {
+            iniciais.add(m.getIniciais());
+        }
+
         return new SkillPod(
                 doc.getId(),
                 nome == null ? "Sem nome" : nome,
                 descricao == null ? "" : descricao,
                 digital,
                 listaDeTexto(doc.get("tags")),
-                listaDeTexto(doc.get("membros")),
+                iniciais,
                 total == null ? 0 : total.intValue(),
                 iconeParaRes(doc.getString("icone")),
-                corIndice);
+                corIndice,
+                integrantes);
+    }
+
+    // Cada membro é um mapa {uid, nome}. Aceita também o formato antigo (só texto).
+    private static List<Membro> lerIntegrantes(Object valor) {
+        List<Membro> lista = new ArrayList<>();
+        if (valor instanceof List<?>) {
+            for (Object item : (List<?>) valor) {
+                if (item instanceof Map<?, ?>) {
+                    Map<?, ?> mapa = (Map<?, ?>) item;
+                    Object uid = mapa.get("uid");
+                    Object nome = mapa.get("nome");
+                    lista.add(new Membro(
+                            uid == null ? null : uid.toString(),
+                            nome == null ? "Sem nome" : nome.toString()));
+                } else if (item != null) {
+                    lista.add(new Membro(null, item.toString()));
+                }
+            }
+        }
+        return lista;
     }
 
     private static List<String> listaDeTexto(Object valor) {

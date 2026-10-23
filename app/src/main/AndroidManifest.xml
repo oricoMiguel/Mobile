@@ -68,6 +68,15 @@
         <activity
             android:name=".EditarPerfilActivity"
             android:exported="false" />
+        <activity
+            android:name=".PerfilFreelancerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PodDetalheActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AreaParticipacoesActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

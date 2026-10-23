@@ -141,7 +141,7 @@
                     android:id="@+id/btnVerSkillPods"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="20dp"
                     android:background="@drawable/bg_botao_outline_home"
                     android:text="Ver skill pods"
                     android:textAllCaps="false"

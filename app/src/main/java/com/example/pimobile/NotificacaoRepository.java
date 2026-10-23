@@ -33,12 +33,15 @@ public class NotificacaoRepository {
                         String mensagem = doc.getString("mensagem");
                         Timestamp criadoEm = doc.getTimestamp("criadoEm");
 
+                        String tipo = doc.getString("tipo");
+
                         lista.add(new Notificacao(
                                 doc.getId(),
                                 titulo == null ? "Aviso" : titulo,
                                 mensagem == null ? "" : mensagem,
                                 Boolean.TRUE.equals(doc.getBoolean("lida")),
-                                criadoEm == null ? 0 : criadoEm.toDate().getTime()));
+                                criadoEm == null ? 0 : criadoEm.toDate().getTime(),
+                                tipo == null ? "equipe" : tipo));
                     }
                     Collections.sort(lista, (a, b) -> Long.compare(b.getCriadoEm(), a.getCriadoEm()));
                     callback.onSucesso(lista);

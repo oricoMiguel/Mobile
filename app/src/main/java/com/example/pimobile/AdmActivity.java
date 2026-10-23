@@ -2,6 +2,7 @@ package com.example.pimobile;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdmActivity extends AppCompatActivity {
@@ -53,24 +55,54 @@ public class AdmActivity extends AppCompatActivity {
     }
 
     private void carregarAlerta(List<AreaAdm> areas) {
-        int totalPendentes = 0;
+        int total = 0;
+        Class<?> primeiroDestino = null;
+        List<String> partes = new ArrayList<>();
+
         for (AreaAdm area : areas) {
-            totalPendentes += area.getPendentes();
+            int pendentes = area.getPendentes();
+            if (pendentes <= 0) continue;
+
+            total += pendentes;
+            if (primeiroDestino == null) primeiroDestino = area.getDestino();
+            partes.add(rotuloPendentes(area));
         }
 
-        ((TextView) findViewById(R.id.txtAlertaTitulo)).setText(totalPendentes
-                + (totalPendentes == 1 ? " item para revisar" : " itens para revisar"));
-        ((TextView) findViewById(R.id.txtAlertaDetalhe)).setText(totalPendentes
-                + (totalPendentes == 1 ? " equipe aguardando aprovação"
-                : " equipes aguardando aprovação"));
+        if (total == 0) {
+            findViewById(R.id.cardAlerta).setVisibility(View.GONE);
+            return;
+        }
 
-        View.OnClickListener revisar = v ->
-                startActivity(new Intent(this, AreaEquipesActivity.class));
+        String detalhe = partes.size() == 1
+                ? partes.get(0)
+                : TextUtils.join(", ", partes.subList(0, partes.size() - 1))
+                  + " e " + partes.get(partes.size() - 1);
+
+        ((TextView) findViewById(R.id.txtAlertaTitulo)).setText(total
+                + (total == 1 ? " item para revisar" : " itens para revisar"));
+        ((TextView) findViewById(R.id.txtAlertaDetalhe)).setText(detalhe + " aguardando aprovação");
+
+        // Abre primeiro a área que tem pendências
+        Class<?> destino = primeiroDestino;
+        View.OnClickListener revisar = v -> startActivity(new Intent(this, destino));
         findViewById(R.id.btnRevisar).setOnClickListener(revisar);
         findViewById(R.id.cardAlerta).setOnClickListener(revisar);
 
-        findViewById(R.id.cardAlerta).setVisibility(
-                totalPendentes == 0 ? View.GONE : View.VISIBLE);
+        findViewById(R.id.cardAlerta).setVisibility(View.VISIBLE);
+    }
+
+    private String rotuloPendentes(AreaAdm area) {
+        int n = area.getPendentes();
+        if (area.getDestino() == AreaEquipesActivity.class) {
+            return n + (n == 1 ? " equipe" : " equipes");
+        }
+        if (area.getDestino() == AreaFreelancerActivity.class) {
+            return n + (n == 1 ? " perfil de freelancer" : " perfis de freelancer");
+        }
+        if (area.getDestino() == AreaParticipacoesActivity.class) {
+            return n + (n == 1 ? " pedido de pod" : " pedidos de pod");
+        }
+        return n + (n == 1 ? " item" : " itens");
     }
 
     private void carregarAreas(List<AreaAdm> areas) {

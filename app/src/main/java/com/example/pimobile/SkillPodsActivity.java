@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import android.content.Intent;
 
 public class SkillPodsActivity extends AppCompatActivity {
 
@@ -165,8 +166,9 @@ public class SkillPodsActivity extends AppCompatActivity {
             montarMembros(listaMembros, pod);
 
             card.findViewById(R.id.btnVerPod).setOnClickListener(v -> {
-                // TODO: abrir os detalhes do skill pod
-                Toast.makeText(this, pod.getNome(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, PodDetalheActivity.class);
+                intent.putExtra("pod_id", pod.getId());
+                startActivity(intent);
             });
 
             listaPods.addView(card);
