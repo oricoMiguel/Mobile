@@ -41,4 +41,19 @@ public class PerfilRepository {
                 })
                 .addOnFailureListener(callback::onErro);
     }
+
+    public static void atualizarNome(String nome, Callback<Void> callback) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            callback.onErro(new IllegalStateException("Nenhum usuário logado"));
+            return;
+        }
+
+        FirebaseFirestore.getInstance()
+                .collection("usuarios")
+                .document(user.getUid())
+                .update("nome", nome)
+                .addOnSuccessListener(x -> callback.onSucesso(null))
+                .addOnFailureListener(callback::onErro);
+    }
 }

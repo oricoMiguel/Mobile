@@ -23,7 +23,8 @@ public class PerfilActivity extends AppCompatActivity {
         InsetsUtil.aplicar(this);
 
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
-        findViewById(R.id.btnEditar).setOnClickListener(v -> emBreve());
+        findViewById(R.id.btnEditar).setOnClickListener(v ->
+                startActivity(new Intent(this, EditarPerfilActivity.class)));
 
         findViewById(R.id.btnLogout).setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
@@ -32,9 +33,17 @@ public class PerfilActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Mostra a lista de opções já, e depois atualiza o contador quando o perfil chegar
+        // Mostra a lista de opções já, e atualiza o contador quando o perfil chegar
         carregarOpcoes(0);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        carregarPerfil();
+    }
+
+    private void carregarPerfil() {
         PerfilRepository.getPerfilAtual(new Callback<Perfil>() {
             @Override
             public void onSucesso(Perfil perfil) {
@@ -65,7 +74,7 @@ public class PerfilActivity extends AppCompatActivity {
         LinearLayout lista = findViewById(R.id.listaOpcoes);
         lista.removeAllViews();
 
-        adicionar(lista, R.drawable.ic_person, "Meu perfil", 0, null);
+        adicionar(lista, R.drawable.ic_person, "Meu perfil", 0, EditarPerfilActivity.class);
         adicionar(lista, R.drawable.ic_briefcase, "Meus projetos", 0, null);
         adicionar(lista, R.drawable.ic_pods, "Minhas equipes", 0, MinhasEquipesActivity.class);
         adicionar(lista, R.drawable.ic_mail, "Mensagens", mensagensNaoLidas, null);

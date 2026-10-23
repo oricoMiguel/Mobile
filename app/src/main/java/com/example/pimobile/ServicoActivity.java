@@ -153,7 +153,8 @@ public class ServicoActivity extends AppCompatActivity {
 
             txtNome.setText(f.getNome());
             txtArea.setText(f.getArea());
-            txtNota.setText(String.format(Locale.US, "%.1f", f.getNota()));
+            txtNota.setText(f.getNota() > 0
+                    ? String.format(Locale.US, "%.1f", f.getNota()) : "Novo");
 
             txtDisponibilidade.setText(f.getDisponibilidade());
             txtDisponibilidade.setTextColor(ContextCompat.getColor(this,

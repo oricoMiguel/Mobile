@@ -65,6 +65,9 @@
         <activity
             android:name=".NotificacoesActivity"
             android:exported="false" />
+        <activity
+            android:name=".EditarPerfilActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
