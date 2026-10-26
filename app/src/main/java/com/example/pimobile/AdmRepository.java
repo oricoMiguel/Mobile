@@ -45,12 +45,12 @@ public class AdmRepository {
                     lista.add(new AreaAdm("Pedidos de equipes",
                             "Aprove ou recuse equipes montadas",
                             nEquipesPendentes + " pendentes",
-                            R.drawable.ic_people, R.drawable.bg_icone_roxo,
+                            R.drawable.ic_pedido_equipe, R.drawable.bg_icone_roxo,
                             AreaEquipesActivity.class, (int) nEquipesPendentes));
                     lista.add(new AreaAdm("Pedidos de pods",
                             "Freelancers que querem entrar em um skill pod",
                             nParticipacoesPendentes + " pendentes",
-                            R.drawable.ic_pods_laranja, R.drawable.bg_icone_laranja,
+                            R.drawable.ic_pedido_pod, R.drawable.bg_icone_laranja,
                             AreaParticipacoesActivity.class, (int) nParticipacoesPendentes));
                     lista.add(new AreaAdm("Área do usuário", "Gerencie contas de usuários",
                             nUsuarios + " usuários",
@@ -63,7 +63,7 @@ public class AdmRepository {
                             AreaFreelancerActivity.class, (int) nFreelancersPendentes));
                     lista.add(new AreaAdm("Gestão de pods", "Organize e monitore os skill pods",
                             nPods + " pods",
-                            R.drawable.ic_pods_laranja, R.drawable.bg_icone_laranja,
+                            R.drawable.ic_gestao_pods, R.drawable.bg_icone_laranja,
                             AreaPodsActivity.class, 0));
                     callback.onSucesso(lista);
                 })

@@ -33,8 +33,6 @@ public abstract class AreaAdmBaseActivity extends AppCompatActivity {
     protected abstract String tituloLista();
     protected abstract String dicaBusca();
     protected abstract void carregarRegistros(Callback<List<RegistroAdm>> callback);
-    protected abstract String[] rotulosCards();                        // 4 rótulos
-    protected abstract String[] valoresCards(List<RegistroAdm> lista); // 4 valores
 
     // Quem quiser uma ação ao tocar no registro sobrescreve este método
     protected void aoClicar(RegistroAdm registro) {
@@ -82,7 +80,6 @@ public abstract class AreaAdmBaseActivity extends AppCompatActivity {
             public void onSucesso(List<RegistroAdm> lista) {
                 if (isFinishing() || isDestroyed()) return;
                 todos = lista;
-                preencherCards();
                 renderizarLista();
             }
 
@@ -99,18 +96,6 @@ public abstract class AreaAdmBaseActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void preencherCards() {
-        int[] idsNum = {R.id.txtNum1, R.id.txtNum2, R.id.txtNum3, R.id.txtNum4};
-        int[] idsRotulo = {R.id.txtRotulo1, R.id.txtRotulo2, R.id.txtRotulo3, R.id.txtRotulo4};
-        String[] rotulos = rotulosCards();
-        String[] valores = valoresCards(todos);
-
-        for (int i = 0; i < 4; i++) {
-            ((TextView) findViewById(idsNum[i])).setText(valores[i]);
-            ((TextView) findViewById(idsRotulo[i])).setText(rotulos[i]);
-        }
     }
 
     private void renderizarLista() {
@@ -148,14 +133,5 @@ public abstract class AreaAdmBaseActivity extends AppCompatActivity {
         }
 
         txtVazio.setVisibility(exibidos == 0 ? View.VISIBLE : View.GONE);
-    }
-
-    // Conta quantos registros têm determinado badgeTipo
-    protected static int contar(List<RegistroAdm> lista, int badgeTipo) {
-        int total = 0;
-        for (RegistroAdm r : lista) {
-            if (r.getBadgeTipo() == badgeTipo) total++;
-        }
-        return total;
     }
 }

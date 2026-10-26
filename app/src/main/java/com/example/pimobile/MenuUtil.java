@@ -20,8 +20,6 @@ public class MenuUtil {
         ligar(activity, drawer, R.id.menuSkillPods, SkillPodsActivity.class);
         ligar(activity, drawer, R.id.menuAdm, AdmActivity.class);
         ligar(activity, drawer, R.id.menuMonteEquipe, MontarEquipeActivity.class);
-        ligar(activity, drawer, R.id.menuEntrar, LoginActivity.class);
-        ligar(activity, drawer, R.id.menuCadastrar, CadastroActivity.class);
         ligar(activity, drawer, R.id.menuPerfil, PerfilActivity.class);
     }
 

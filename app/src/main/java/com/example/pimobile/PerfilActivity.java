@@ -33,8 +33,7 @@ public class PerfilActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Mostra a lista de opções já, e atualiza o contador quando o perfil chegar
-        carregarOpcoes(0);
+        carregarOpcoes();
     }
 
     @Override
@@ -49,7 +48,6 @@ public class PerfilActivity extends AppCompatActivity {
             public void onSucesso(Perfil perfil) {
                 if (isFinishing() || isDestroyed()) return;
                 preencher(perfil);
-                carregarOpcoes(perfil.getMensagensNaoLidas());
             }
 
             @Override
@@ -70,21 +68,19 @@ public class PerfilActivity extends AppCompatActivity {
                 perfil.isVerificado() ? View.VISIBLE : View.GONE);
     }
 
-    private void carregarOpcoes(int mensagensNaoLidas) {
+    private void carregarOpcoes() {
         LinearLayout lista = findViewById(R.id.listaOpcoes);
         lista.removeAllViews();
 
-        adicionar(lista, R.drawable.ic_person, "Meu perfil", 0, EditarPerfilActivity.class);
-        adicionar(lista, R.drawable.ic_briefcase, "Meus projetos", 0, null);
-        adicionar(lista, R.drawable.ic_pods, "Minhas equipes", 0, MinhasEquipesActivity.class);
-        adicionar(lista, R.drawable.ic_mail, "Mensagens", mensagensNaoLidas, null);
-        adicionar(lista, R.drawable.ic_bell, "Notificações", 0, NotificacoesActivity.class);
-        adicionar(lista, R.drawable.ic_settings, "Configurações", 0, null);
-        adicionar(lista, R.drawable.ic_doc, "Termos e privacidade", 0, null);
+        adicionar(lista, R.drawable.ic_person, "Meu perfil", EditarPerfilActivity.class);
+        adicionar(lista, R.drawable.ic_briefcase, "Meus projetos", null);
+        adicionar(lista, R.drawable.ic_pods, "Minhas equipes", MinhasEquipesActivity.class);
+        adicionar(lista, R.drawable.ic_bell, "Notificações", NotificacoesActivity.class);
+        adicionar(lista, R.drawable.ic_settings, "Configurações", null);
+        adicionar(lista, R.drawable.ic_doc, "Termos e privacidade", TermosActivity.class);
     }
 
-    private void adicionar(LinearLayout lista, int iconeRes, String titulo, int contador,
-                           Class<?> destino) {
+    private void adicionar(LinearLayout lista, int iconeRes, String titulo, Class<?> destino) {
         View item = LayoutInflater.from(this).inflate(R.layout.item_perfil_opcao, lista, false);
 
         ImageView icone = item.findViewById(R.id.imgIcone);
@@ -92,12 +88,6 @@ public class PerfilActivity extends AppCompatActivity {
         icone.setColorFilter(ContextCompat.getColor(this, R.color.roxo_icone));
 
         ((TextView) item.findViewById(R.id.txtTitulo)).setText(titulo);
-
-        TextView txtContador = item.findViewById(R.id.txtContador);
-        if (contador > 0) {
-            txtContador.setText(String.valueOf(contador));
-            txtContador.setVisibility(View.VISIBLE);
-        }
 
         item.setOnClickListener(v -> {
             if (destino == null) {

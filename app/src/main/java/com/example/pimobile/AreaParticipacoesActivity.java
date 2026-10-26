@@ -19,21 +19,6 @@ public class AreaParticipacoesActivity extends AreaAdmBaseActivity {
     }
 
     @Override
-    protected String[] rotulosCards() {
-        return new String[]{"Total de pedidos", "Pendentes", "Aprovados", "Recusados"};
-    }
-
-    @Override
-    protected String[] valoresCards(List<RegistroAdm> lista) {
-        return new String[]{
-                String.valueOf(lista.size()),
-                String.valueOf(contar(lista, 1)),
-                String.valueOf(contar(lista, 0)),
-                String.valueOf(contar(lista, 2))
-        };
-    }
-
-    @Override
     protected void aoClicar(RegistroAdm registro) {
         new AlertDialog.Builder(this)
                 .setTitle(registro.getNome())
