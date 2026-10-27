@@ -57,6 +57,8 @@ public class SkillPodsActivity extends AppCompatActivity {
         todos = new ArrayList<>();
 
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
+        findViewById(R.id.btnProporPod).setOnClickListener(v ->
+                startActivity(new Intent(this, ProporPodActivity.class)));
         findViewById(R.id.btnFiltro).setOnClickListener(v ->
                 Toast.makeText(this, "Filtros em breve", Toast.LENGTH_SHORT).show());
 
@@ -147,6 +149,23 @@ public class SkillPodsActivity extends AppCompatActivity {
             txtNome.setText(pod.getNome());
             txtPessoas.setText(String.valueOf(pod.getTotalPessoas()));
             txtDescricao.setText(pod.getDescricao());
+
+            // Pod aprovado que ainda não tem nenhum freelancer
+            if (pod.getTotalPessoas() == 0) {
+                TextView emFormacao = new TextView(this);
+                emFormacao.setText("Em formação");
+                emFormacao.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+                emFormacao.setTypeface(emFormacao.getTypeface(), Typeface.BOLD);
+                emFormacao.setTextColor(ContextCompat.getColor(this, R.color.eq_texto_claro));
+                emFormacao.setBackgroundResource(R.drawable.bg_tag_cinza);
+                emFormacao.setPadding(dp(10), dp(4), dp(10), dp(4));
+
+                LinearLayout.LayoutParams lpFormacao = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lpFormacao.setMarginEnd(dp(6));
+                emFormacao.setLayoutParams(lpFormacao);
+                listaTags.addView(emFormacao);
+            }
 
             for (String tagTexto : pod.getTags()) {
                 TextView tag = new TextView(this);

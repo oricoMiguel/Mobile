@@ -80,6 +80,12 @@
         <activity
             android:name=".TermosActivity"
             android:exported="false" />
+        <activity
+            android:name=".ProporPodActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AreaPropostasPodActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

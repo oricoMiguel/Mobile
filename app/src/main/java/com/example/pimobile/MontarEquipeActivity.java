@@ -105,6 +105,8 @@ public class MontarEquipeActivity extends AppCompatActivity {
 
                 todosPods.clear();
                 for (SkillPod pod : pods) {
+                    // Pod vazio ("em formação") ainda não pode ser contratado
+                    if (pod.getTotalPessoas() < 1) continue;
                     todosPods.add(new PodOpcao(
                             pod.getId(),
                             pod.getNome(),

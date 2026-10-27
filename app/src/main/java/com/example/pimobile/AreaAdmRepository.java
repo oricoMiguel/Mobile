@@ -298,6 +298,159 @@ public class AreaAdmRepository {
                 .addOnFailureListener(callback::onErro);
     }
 
+    // ---------- Propostas de novos skill pods ----------
+    // nome = pod proposto | subtitulo = autor | detalhe = formato, tags e data
+    public static void getPropostasPod(Callback<List<RegistroAdm>> callback) {
+        FirebaseFirestore.getInstance().collection("propostasPod")
+                .get()
+                .addOnSuccessListener(query -> {
+                    List<DocumentSnapshot> docs = new ArrayList<>(query.getDocuments());
+
+                    // Pendentes primeiro; dentro de cada grupo, as mais recentes
+                    Collections.sort(docs, (a, b) -> {
+                        boolean pa = "pendente".equals(a.getString("status"));
+                        boolean pb = "pendente".equals(b.getString("status"));
+                        if (pa != pb) return pa ? -1 : 1;
+                        return Long.compare(millis(b.getTimestamp("criadoEm")),
+                                millis(a.getTimestamp("criadoEm")));
+                    });
+
+                    SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy", BR);
+                    List<RegistroAdm> lista = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : docs) {
+                        String nome = doc.getString("nome");
+                        String descricao = doc.getString("descricao");
+                        String autor = doc.getString("usuarioNome");
+                        String status = doc.getString("status");
+                        boolean digital = Boolean.TRUE.equals(doc.getBoolean("digital"));
+                        String tags = TextUtils.join(", ", listaDeTexto(doc.get("tags")));
+                        Timestamp criadoEm = doc.getTimestamp("criadoEm");
+
+                        String badge;
+                        int badgeTipo;
+                        if ("aprovada".equals(status)) {
+                            badge = "Aprovada";
+                            badgeTipo = 0;
+                        } else if ("recusada".equals(status)) {
+                            badge = "Recusada";
+                            badgeTipo = 2;
+                        } else {
+                            badge = "Pendente";
+                            badgeTipo = 1;
+                        }
+
+                        String detalhe = (digital ? "Digital" : "Presencial")
+                                + (tags.isEmpty() ? "" : " · " + tags)
+                                + (criadoEm == null ? "" : " · " + formato.format(criadoEm.toDate()));
+
+                        lista.add(new PropostaPodRegistro(
+                                doc.getId(),
+                                nome == null ? "Sem nome" : nome,
+                                "Proposto por " + (autor == null ? "usuário" : autor),
+                                detalhe,
+                                badge,
+                                badgeTipo,
+                                corPorId(doc.getId()),
+                                descricao == null ? "" : descricao));
+                    }
+                    callback.onSucesso(lista);
+                })
+                .addOnFailureListener(callback::onErro);
+    }
+
+    // status: "aprovada" ou "recusada".
+    // Ao aprovar, numa única transação: o pod nasce no catálogo, a proposta guarda o podId,
+    // e quem propôs recebe o aviso. Se quem propôs é freelancer com perfil aprovado, ele
+    // entra como primeiro membro; se não, o pod nasce vazio ("em formação").
+    public static void atualizarStatusPropostaPod(String propostaId, String status,
+                                                  Callback<Void> callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference ref = db.collection("propostasPod").document(propostaId);
+        boolean aprovada = "aprovada".equals(status);
+
+        db.runTransaction(transacao -> {
+                    DocumentSnapshot proposta = transacao.get(ref);
+
+                    // Evita criar o pod duas vezes se outro admin já decidiu
+                    if (!"pendente".equals(proposta.getString("status"))) {
+                        throw new FirebaseFirestoreException("Esta proposta já foi decidida",
+                                FirebaseFirestoreException.Code.FAILED_PRECONDITION);
+                    }
+
+                    String usuarioId = proposta.getString("usuarioId");
+                    String nome = proposta.getString("nome");
+                    String nomePod = nome == null ? "pod" : nome;
+
+                    // Todas as leituras antes das escritas
+                    String freelancerNome = null;
+                    if (aprovada && usuarioId != null) {
+                        DocumentSnapshot conta = transacao.get(
+                                db.collection("usuarios").document(usuarioId));
+                        if ("Freelancer".equals(conta.getString("tipoConta"))) {
+                            DocumentSnapshot perfil = transacao.get(
+                                    db.collection("freelancers").document(usuarioId));
+                            if (perfil.exists() && "aprovado".equals(perfil.getString("status"))) {
+                                freelancerNome = perfil.getString("nome");
+                            }
+                        }
+                    }
+
+                    boolean primeiroMembro = freelancerNome != null;
+
+                    if (aprovada) {
+                        IconesPod.Item icone = IconesPod.porChave(proposta.getString("icone"));
+                        Boolean digital = proposta.getBoolean("digital");
+                        DocumentReference podRef = db.collection("skillPods").document();
+
+                        List<Object> membros = new ArrayList<>();
+                        if (primeiroMembro) {
+                            Map<String, Object> membro = new HashMap<>();
+                            membro.put("uid", usuarioId);
+                            membro.put("nome", freelancerNome);
+                            membros.add(membro);
+                        }
+
+                        Map<String, Object> pod = new HashMap<>();
+                        pod.put("nome", nomePod);
+                        pod.put("descricao", proposta.getString("descricao"));
+                        pod.put("digital", Boolean.TRUE.equals(digital));
+                        pod.put("tags", listaDeTexto(proposta.get("tags")));
+                        pod.put("membros", membros);
+                        pod.put("totalPessoas", membros.size());
+                        pod.put("icone", icone.chave);
+                        pod.put("cor", icone.cor);
+                        // Segundos desde 1970: sempre depois dos pods antigos (1 a 4)
+                        pod.put("ordem", System.currentTimeMillis() / 1000);
+                        transacao.set(podRef, pod);
+
+                        transacao.update(ref, "status", status, "podId", podRef.getId());
+                    } else {
+                        transacao.update(ref, "status", status);
+                    }
+
+                    if (usuarioId != null) {
+                        Map<String, Object> aviso = new HashMap<>();
+                        aviso.put("usuarioId", usuarioId);
+                        aviso.put("tipo", "pod");
+                        aviso.put("titulo", aprovada ? "Seu pod foi aprovado" : "Proposta de pod recusada");
+                        aviso.put("mensagem", aprovada
+                                ? "O " + nomePod + " já está no catálogo."
+                                  + (primeiroMembro
+                                        ? " Você é o primeiro membro."
+                                        : " Ele aparece como \"Em formação\" até um freelancer entrar.")
+                                : "Sua proposta do " + nomePod + " não foi aprovada desta vez.");
+                        aviso.put("lida", false);
+                        aviso.put("criadoEm", FieldValue.serverTimestamp());
+                        transacao.set(db.collection("notificacoes").document(), aviso);
+                    }
+
+                    return null;
+                })
+                .addOnSuccessListener(x -> callback.onSucesso(null))
+                .addOnFailureListener(callback::onErro);
+    }
+
     // ---------- Pedidos de equipes ----------
     // nome = pod | subtitulo = solicitante | detalhe = tipo, pessoas e data
     public static void getEquipes(Callback<List<RegistroAdm>> callback) {

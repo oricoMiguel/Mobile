@@ -31,8 +31,12 @@ public class AdmRepository {
                 db.collection("participacoes").whereEqualTo("status", "pendente")
                         .count().get(AggregateSource.SERVER);
 
+        Task<AggregateQuerySnapshot> propostasPendentes =
+                db.collection("propostasPod").whereEqualTo("status", "pendente")
+                        .count().get(AggregateSource.SERVER);
+
         Tasks.whenAllSuccess(usuarios, freelancers, freelancersPendentes, pods,
-                        equipesPendentes, participacoesPendentes)
+                        equipesPendentes, participacoesPendentes, propostasPendentes)
                 .addOnSuccessListener(x -> {
                     long nUsuarios = usuarios.getResult().getCount();
                     long nFreelancers = freelancers.getResult().getCount();
@@ -40,6 +44,7 @@ public class AdmRepository {
                     long nPods = pods.getResult().getCount();
                     long nEquipesPendentes = equipesPendentes.getResult().getCount();
                     long nParticipacoesPendentes = participacoesPendentes.getResult().getCount();
+                    long nPropostasPendentes = propostasPendentes.getResult().getCount();
 
                     List<AreaAdm> lista = new ArrayList<>();
                     lista.add(new AreaAdm("Pedidos de equipes",
@@ -52,6 +57,11 @@ public class AdmRepository {
                             nParticipacoesPendentes + " pendentes",
                             R.drawable.ic_pedido_pod, R.drawable.bg_icone_laranja,
                             AreaParticipacoesActivity.class, (int) nParticipacoesPendentes));
+                    lista.add(new AreaAdm("Propostas de pods",
+                            "Ideias de novos skill pods enviadas por usuários e freelancers",
+                            nPropostasPendentes + " pendentes",
+                            R.drawable.ic_gestao_pods, R.drawable.bg_icone_verde,
+                            AreaPropostasPodActivity.class, (int) nPropostasPendentes));
                     lista.add(new AreaAdm("Área do usuário", "Gerencie contas de usuários",
                             nUsuarios + " usuários",
                             R.drawable.ic_users_purple, R.drawable.bg_icone_roxo,

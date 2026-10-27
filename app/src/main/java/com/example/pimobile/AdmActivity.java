@@ -102,6 +102,9 @@ public class AdmActivity extends AppCompatActivity {
         if (area.getDestino() == AreaParticipacoesActivity.class) {
             return n + (n == 1 ? " pedido de pod" : " pedidos de pod");
         }
+        if (area.getDestino() == AreaPropostasPodActivity.class) {
+            return n + (n == 1 ? " proposta de pod" : " propostas de pods");
+        }
         return n + (n == 1 ? " item" : " itens");
     }
 

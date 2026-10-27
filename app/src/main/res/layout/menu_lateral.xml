@@ -18,7 +18,7 @@
         android:padding="12dp"
         android:text="Início"
         android:textColor="@color/branco"
-        android:textSize="16sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/menuServicos"
@@ -27,7 +27,7 @@
         android:padding="12dp"
         android:text="Serviços"
         android:textColor="@color/branco"
-        android:textSize="16sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/menuSkillPods"
@@ -36,7 +36,7 @@
         android:padding="12dp"
         android:text="Skill Pods"
         android:textColor="@color/branco"
-        android:textSize="16sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/menuAdm"
@@ -45,7 +45,7 @@
         android:padding="12dp"
         android:text="ADM"
         android:textColor="@color/branco"
-        android:textSize="16sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/menuMonteEquipe"
@@ -54,7 +54,7 @@
         android:padding="12dp"
         android:text="Monte sua Equipe"
         android:textColor="@color/branco"
-        android:textSize="16sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/menuPerfil"
@@ -63,5 +63,5 @@
         android:padding="12dp"
         android:text="Perfil"
         android:textColor="@color/branco"
-        android:textSize="16sp" />
+        android:textSize="20sp" />
 </LinearLayout>

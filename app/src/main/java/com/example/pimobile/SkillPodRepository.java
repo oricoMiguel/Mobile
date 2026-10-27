@@ -31,6 +31,7 @@ public class SkillPodRepository {
 
     public static void getPopulares(Callback<List<SkillPodResumo>> callback) {
         FirebaseFirestore.getInstance().collection(COLECAO)
+                .whereGreaterThan("totalPessoas", 0)
                 .orderBy("totalPessoas", Query.Direction.DESCENDING)
                 .limit(2)
                 .get()
@@ -119,12 +120,6 @@ public class SkillPodRepository {
     }
 
     private static int iconeParaRes(String chave) {
-        if (chave == null) return R.drawable.ic_code;
-        switch (chave) {
-            case "palette":   return R.drawable.ic_palette;
-            case "megaphone": return R.drawable.ic_megaphone;
-            case "code":
-            default:          return R.drawable.ic_code;
-        }
+        return IconesPod.porChave(chave).res;
     }
 }
