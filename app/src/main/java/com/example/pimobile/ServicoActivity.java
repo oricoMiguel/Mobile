@@ -1,6 +1,5 @@
 package com.example.pimobile;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,17 +23,14 @@ import android.content.Intent;
 
 public class ServicoActivity extends AppCompatActivity {
 
-    private static final String TODOS = "Todos";
-
     private final int[] fundoAvatar = {R.drawable.bg_avatar_roxo, R.drawable.bg_avatar_verde, R.drawable.bg_avatar_laranja};
     private final int[] fundoTag = {R.drawable.bg_tag_roxa, R.drawable.bg_tag_verde, R.drawable.bg_tag_laranja};
     private final int[] corTexto = {R.color.roxo_icone, R.color.texto_verde, R.color.laranja_icone};
 
     private List<Freelancer> todos;
-    private String categoriaAtual = TODOS;
     private String textoBusca = "";
 
-    private LinearLayout listaFreelancers, listaCategorias;
+    private LinearLayout listaFreelancers;
     private TextView txtVazio;
 
     @Override
@@ -45,7 +41,6 @@ public class ServicoActivity extends AppCompatActivity {
         MenuUtil.configurar(this);
 
         listaFreelancers = findViewById(R.id.listaFreelancers);
-        listaCategorias = findViewById(R.id.listaCategorias);
         txtVazio = findViewById(R.id.txtVazio);
         EditText edtBusca = findViewById(R.id.edtBusca);
 
@@ -66,14 +61,11 @@ public class ServicoActivity extends AppCompatActivity {
             }
         });
 
-        renderizarCategorias();
-
         FreelancerRepository.getTodos(new Callback<List<Freelancer>>() {
             @Override
             public void onSucesso(List<Freelancer> freelancers) {
                 if (isFinishing() || isDestroyed()) return;
                 todos = freelancers;
-                renderizarCategorias();
                 renderizarFreelancers();
             }
 
@@ -84,45 +76,6 @@ public class ServicoActivity extends AppCompatActivity {
                         "Não foi possível carregar os freelancers", Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    private void renderizarCategorias() {
-        listaCategorias.removeAllViews();
-
-        List<String> categorias = new ArrayList<>();
-        categorias.add(TODOS);
-        for (Freelancer f : todos) {
-            if (!categorias.contains(f.getCategoria())) {
-                categorias.add(f.getCategoria());
-            }
-        }
-
-        for (String categoria : categorias) {
-            boolean ativo = categoria.equals(categoriaAtual);
-
-            TextView chip = new TextView(this);
-            chip.setText(categoria);
-            chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            chip.setPadding(dp(16), dp(8), dp(16), dp(8));
-            chip.setBackgroundResource(ativo ? R.drawable.bg_chip_filtro_ativo : R.drawable.bg_chip_filtro);
-            chip.setTextColor(ContextCompat.getColor(this, ativo ? R.color.branco : R.color.eq_escuro));
-            if (ativo) {
-                chip.setTypeface(chip.getTypeface(), Typeface.BOLD);
-            }
-
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lp.setMarginEnd(dp(8));
-            chip.setLayoutParams(lp);
-
-            chip.setOnClickListener(v -> {
-                categoriaAtual = categoria;
-                renderizarCategorias();
-                renderizarFreelancers();
-            });
-
-            listaCategorias.addView(chip);
-        }
     }
 
     private void renderizarFreelancers() {
@@ -190,9 +143,6 @@ public class ServicoActivity extends AppCompatActivity {
     }
 
     private boolean passaNoFiltro(Freelancer f) {
-        if (!categoriaAtual.equals(TODOS) && !f.getCategoria().equals(categoriaAtual)) {
-            return false;
-        }
         if (textoBusca.isEmpty()) {
             return true;
         }

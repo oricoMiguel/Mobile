@@ -127,20 +127,6 @@
                         android:src="@drawable/ic_filter" />
                 </LinearLayout>
 
-                <!-- Categorias (criadas pelo Java) -->
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="14dp"
-                    android:scrollbars="none">
-
-                    <LinearLayout
-                        android:id="@+id/listaCategorias"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal" />
-                </HorizontalScrollView>
-
                 <!-- Freelancers (criados pelo Java) -->
                 <LinearLayout
                     android:id="@+id/listaFreelancers"

@@ -86,6 +86,9 @@
         <activity
             android:name=".AreaPropostasPodActivity"
             android:exported="false" />
+        <activity
+            android:name=".PedidosRecebidosActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

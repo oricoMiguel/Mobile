@@ -35,7 +35,16 @@ public class MinhasEquipesActivity extends AppCompatActivity {
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
         btnMontarEquipe.setOnClickListener(v ->
                 startActivity(new Intent(this, MontarEquipeActivity.class)));
+    }
 
+    // Recarrega ao voltar para a tela, assim o status novo (aceito/recusado) aparece
+    @Override
+    protected void onResume() {
+        super.onResume();
+        carregarEquipes();
+    }
+
+    private void carregarEquipes() {
         EquipeRepository.getMinhasEquipes(new Callback<List<Equipe>>() {
             @Override
             public void onSucesso(List<Equipe> equipes) {
@@ -75,8 +84,10 @@ public class MinhasEquipesActivity extends AppCompatActivity {
 
             ((TextView) card.findViewById(R.id.txtNome)).setText(equipe.getPodNome());
 
-            String detalhe = equipe.getPessoas() + " pessoas";
-            if (!equipe.getTipo().isEmpty()) {
+            String detalhe = equipe.getPessoas() == 1 ? "1 pessoa" : equipe.getPessoas() + " pessoas";
+            if (equipe.isFreelancer()) {
+                detalhe = "Freelancer · " + detalhe;
+            } else if (!equipe.getTipo().isEmpty()) {
                 detalhe = equipe.getTipo() + " · " + detalhe;
             }
             ((TextView) card.findViewById(R.id.txtDetalhe)).setText(detalhe);
@@ -88,16 +99,18 @@ public class MinhasEquipesActivity extends AppCompatActivity {
                 txtData.setVisibility(View.GONE);
             }
 
-            configurarStatus(card.findViewById(R.id.txtStatus), equipe.getStatus());
+            configurarStatus(card.findViewById(R.id.txtStatus), equipe.getStatus(),
+                    equipe.isFreelancer());
 
             listaEquipes.addView(card);
         }
     }
 
-    private void configurarStatus(TextView chip, String status) {
+    // Pedido de freelancer: o freelancer "aceita"; pedido de pod: o admin "aprova"
+    private void configurarStatus(TextView chip, String status, boolean freelancer) {
         switch (status) {
             case "aprovada":
-                chip.setText("Aprovada");
+                chip.setText(freelancer ? "Aceita" : "Aprovada");
                 chip.setBackgroundResource(R.drawable.bg_tag_verde);
                 chip.setTextColor(ContextCompat.getColor(this, R.color.texto_verde));
                 break;
@@ -108,7 +121,7 @@ public class MinhasEquipesActivity extends AppCompatActivity {
                 break;
             case "pendente":
             default:
-                chip.setText("Pendente");
+                chip.setText(freelancer ? "Aguardando freelancer" : "Pendente");
                 chip.setBackgroundResource(R.drawable.bg_tag_laranja);
                 chip.setTextColor(ContextCompat.getColor(this, R.color.laranja_status));
                 break;

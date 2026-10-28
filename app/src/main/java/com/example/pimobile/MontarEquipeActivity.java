@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MontarEquipeActivity extends AppCompatActivity {
@@ -37,6 +38,11 @@ public class MontarEquipeActivity extends AppCompatActivity {
             this.digital = digital;
             this.iconeRes = iconeRes;
             this.fundoRes = fundoRes;
+        }
+
+        // Pod sem membros aprovados ainda não pode ser contratado
+        boolean emFormacao() {
+            return pessoas < 1;
         }
     }
 
@@ -105,8 +111,6 @@ public class MontarEquipeActivity extends AppCompatActivity {
 
                 todosPods.clear();
                 for (SkillPod pod : pods) {
-                    // Pod vazio ("em formação") ainda não pode ser contratado
-                    if (pod.getTotalPessoas() < 1) continue;
                     todosPods.add(new PodOpcao(
                             pod.getId(),
                             pod.getNome(),
@@ -116,6 +120,12 @@ public class MontarEquipeActivity extends AppCompatActivity {
                             pod.getIconeRes(),
                             fundoIcone[pod.getCor()]));
                 }
+
+                // Pods contratáveis primeiro, "em formação" no fim.
+                // A ordenação é estável, então a ordem original (campo "ordem") é mantida.
+                Collections.sort(todosPods,
+                        (a, b) -> Boolean.compare(a.emFormacao(), b.emFormacao()));
+
                 podSelecionado = null;
                 atualizarTela();
             }
@@ -131,7 +141,9 @@ public class MontarEquipeActivity extends AppCompatActivity {
 
     private String montarDescricao(SkillPod pod) {
         String tags = TextUtils.join(", ", pod.getTags());
-        String pessoas = pod.getTotalPessoas() + " pessoas";
+        String pessoas = pod.getTotalPessoas() < 1
+                ? "Em formação"
+                : pod.getTotalPessoas() + " pessoas";
         return tags.isEmpty() ? pessoas : tags + " · " + pessoas;
     }
 
@@ -199,6 +211,18 @@ public class MontarEquipeActivity extends AppCompatActivity {
             imgIcone.setImageResource(pod.iconeRes);
             txtNome.setText(pod.nome);
             txtDescricao.setText(pod.descricao);
+
+            // Pod em formação: aparece esmaecido e não pode ser selecionado
+            if (pod.emFormacao()) {
+                item.setBackgroundResource(R.drawable.bg_card_opcao);
+                item.setAlpha(0.55f);
+                imgRadio.setVisibility(View.INVISIBLE);
+                item.setOnClickListener(v -> Toast.makeText(this,
+                        "Este pod ainda está em formação. Ele fica disponível quando tiver o primeiro membro.",
+                        Toast.LENGTH_SHORT).show());
+                listaPods.addView(item);
+                continue;
+            }
 
             boolean selecionado = pod == podSelecionado;
             item.setBackgroundResource(selecionado

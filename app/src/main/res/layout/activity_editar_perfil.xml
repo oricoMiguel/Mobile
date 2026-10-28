@@ -94,6 +94,119 @@
                     android:textSize="16sp" />
             </FrameLayout>
 
+            <!-- Campos específicos da conta de usuário/contratante -->
+            <LinearLayout
+                android:id="@+id/secaoUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Telefone (opcional)"
+                    android:textColor="@color/eq_texto_claro"
+                    android:textSize="13sp" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_campo_login">
+                    <EditText
+                        android:id="@+id/edtTelefoneUsuario"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:gravity="center_vertical|start"
+                        android:hint="Ex.: (11) 99999-9999"
+                        android:inputType="phone"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/preto"
+                        android:textColorHint="@color/cinza_icone"
+                        android:textSize="16sp" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Empresa ou organização (opcional)"
+                    android:textColor="@color/eq_texto_claro"
+                    android:textSize="13sp" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_campo_login">
+                    <EditText
+                        android:id="@+id/edtEmpresa"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:gravity="center_vertical|start"
+                        android:hint="Nome da empresa ou organização"
+                        android:inputType="textCapWords"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/preto"
+                        android:textColorHint="@color/cinza_icone"
+                        android:textSize="16sp" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Cidade (opcional)"
+                    android:textColor="@color/eq_texto_claro"
+                    android:textSize="13sp" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_campo_login">
+                    <EditText
+                        android:id="@+id/edtCidade"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:gravity="center_vertical|start"
+                        android:hint="Ex.: Mauá"
+                        android:inputType="textCapWords"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/preto"
+                        android:textColorHint="@color/cinza_icone"
+                        android:textSize="16sp" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Estado (opcional)"
+                    android:textColor="@color/eq_texto_claro"
+                    android:textSize="13sp" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_campo_login">
+                    <EditText
+                        android:id="@+id/edtEstado"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:gravity="center_vertical|start"
+                        android:hint="Ex.: São Paulo ou SP"
+                        android:inputType="textCapWords"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/preto"
+                        android:textColorHint="@color/cinza_icone"
+                        android:textSize="16sp" />
+                </FrameLayout>
+            </LinearLayout>
+
             <!-- Só aparece para quem é freelancer -->
             <LinearLayout
                 android:id="@+id/secaoProfissional"
@@ -233,6 +346,132 @@
                         android:textColorHint="@color/cinza_icone"
                         android:textSize="16sp" />
                 </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Formas de contato (opcional)"
+                    android:textColor="@color/eq_escuro"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Preencha somente os contatos que deseja exibir no seu perfil público."
+                    android:textColor="@color/eq_texto_claro"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="WhatsApp (com DDD)"
+                    android:textColor="@color/eq_texto_claro"
+                    android:textSize="13sp" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_campo_login">
+                    <EditText
+                        android:id="@+id/edtWhatsapp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:gravity="center_vertical|start"
+                        android:hint="Ex.: 5511999999999"
+                        android:inputType="phone"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/preto"
+                        android:textColorHint="@color/cinza_icone"
+                        android:textSize="16sp" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Instagram (usuário ou link)"
+                    android:textColor="@color/eq_texto_claro"
+                    android:textSize="13sp" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_campo_login">
+                    <EditText
+                        android:id="@+id/edtInstagram"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:gravity="center_vertical|start"
+                        android:hint="Ex.: @meuperfil"
+                        android:inputType="textUri"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/preto"
+                        android:textColorHint="@color/cinza_icone"
+                        android:textSize="16sp" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="Telefone (opcional)"
+                    android:textColor="@color/eq_texto_claro"
+                    android:textSize="13sp" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_campo_login">
+                    <EditText
+                        android:id="@+id/edtTelefone"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:gravity="center_vertical|start"
+                        android:hint="Ex.: (11) 3333-3333"
+                        android:inputType="phone"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/preto"
+                        android:textColorHint="@color/cinza_icone"
+                        android:textSize="16sp" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="E-mail para contato (opcional)"
+                    android:textColor="@color/eq_texto_claro"
+                    android:textSize="13sp" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_campo_login">
+                    <EditText
+                        android:id="@+id/edtEmailContato"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:gravity="center_vertical|start"
+                        android:hint="Ex.: contato@exemplo.com"
+                        android:inputType="textEmailAddress"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/preto"
+                        android:textColorHint="@color/cinza_icone"
+                        android:textSize="16sp" />
+                </FrameLayout>
+
             </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatButton

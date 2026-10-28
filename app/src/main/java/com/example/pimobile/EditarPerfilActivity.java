@@ -21,11 +21,13 @@ public class EditarPerfilActivity extends AppCompatActivity {
     private static final String[] CATEGORIAS = {"Desenvolvimento", "Design", "Marketing", "Outros"};
 
     private EditText edtNome, edtArea, edtHabilidades, edtDisponibilidade;
+    private EditText edtTelefoneUsuario, edtEmpresa, edtCidade, edtEstado;
+    private EditText edtWhatsapp, edtInstagram, edtTelefone, edtEmailContato;
     private Spinner spinnerCategoria;
     private SwitchCompat switchDisponivel;
     private TextView txtStatus;
     private Button btnSalvar;
-    private View secaoProfissional;
+    private View secaoProfissional, secaoUsuario;
 
     private String nomeOriginal = "";
     private boolean ehFreelancer = false;
@@ -41,11 +43,20 @@ public class EditarPerfilActivity extends AppCompatActivity {
         edtArea = findViewById(R.id.edtArea);
         edtHabilidades = findViewById(R.id.edtHabilidades);
         edtDisponibilidade = findViewById(R.id.edtDisponibilidade);
+        edtWhatsapp = findViewById(R.id.edtWhatsapp);
+        edtInstagram = findViewById(R.id.edtInstagram);
+        edtTelefone = findViewById(R.id.edtTelefone);
+        edtEmailContato = findViewById(R.id.edtEmailContato);
         spinnerCategoria = findViewById(R.id.spinnerCategoria);
         switchDisponivel = findViewById(R.id.switchDisponivel);
         txtStatus = findViewById(R.id.txtStatus);
         btnSalvar = findViewById(R.id.btnSalvar);
         secaoProfissional = findViewById(R.id.secaoProfissional);
+        secaoUsuario = findViewById(R.id.secaoUsuario);
+        edtTelefoneUsuario = findViewById(R.id.edtTelefoneUsuario);
+        edtEmpresa = findViewById(R.id.edtEmpresa);
+        edtCidade = findViewById(R.id.edtCidade);
+        edtEstado = findViewById(R.id.edtEstado);
 
         spinnerCategoria.setAdapter(new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_dropdown_item, CATEGORIAS));
@@ -66,8 +77,14 @@ public class EditarPerfilActivity extends AppCompatActivity {
                 ehFreelancer = "Freelancer".equals(perfil.getTipoConta());
                 if (ehFreelancer) {
                     secaoProfissional.setVisibility(View.VISIBLE);
+                    secaoUsuario.setVisibility(View.GONE);
                     carregarPerfilProfissional();
                 } else {
+                    secaoUsuario.setVisibility(View.VISIBLE);
+                    edtTelefoneUsuario.setText(perfil.getTelefone());
+                    edtEmpresa.setText(perfil.getEmpresa());
+                    edtCidade.setText(perfil.getCidade());
+                    edtEstado.setText(perfil.getEstado());
                     btnSalvar.setEnabled(true);
                 }
             }
@@ -94,6 +111,10 @@ public class EditarPerfilActivity extends AppCompatActivity {
                     edtHabilidades.setText(TextUtils.join(", ", perfil.getHabilidades()));
                     switchDisponivel.setChecked(perfil.isDisponivel());
                     edtDisponibilidade.setText(perfil.getDisponibilidade());
+                    edtWhatsapp.setText(perfil.getWhatsapp());
+                    edtInstagram.setText(perfil.getInstagram());
+                    edtTelefone.setText(perfil.getTelefone());
+                    edtEmailContato.setText(perfil.getEmailContato());
                     txtStatus.setText(textoStatus(perfil.getStatus()));
                 } else {
                     switchDisponivel.setChecked(true);
@@ -125,12 +146,30 @@ public class EditarPerfilActivity extends AppCompatActivity {
         }
 
         if (!ehFreelancer) {
-            if (nome.equals(nomeOriginal)) {
-                finish();
+            String telefone = edtTelefoneUsuario.getText().toString().trim();
+            String empresa = edtEmpresa.getText().toString().trim();
+            String cidade = edtCidade.getText().toString().trim();
+            String estado = edtEstado.getText().toString().trim();
+
+            if (telefone.length() > 30) {
+                aviso("O telefone pode ter no máximo 30 caracteres");
                 return;
             }
+            if (empresa.length() > 100) {
+                aviso("O nome da empresa pode ter no máximo 100 caracteres");
+                return;
+            }
+            if (cidade.length() > 80) {
+                aviso("A cidade pode ter no máximo 80 caracteres");
+                return;
+            }
+            if (estado.length() > 50) {
+                aviso("O estado pode ter no máximo 50 caracteres");
+                return;
+            }
+
             btnSalvar.setEnabled(false);
-            PerfilRepository.atualizarNome(nome, new Callback<Void>() {
+            PerfilRepository.atualizarPerfilUsuario(nome, telefone, empresa, cidade, estado, new Callback<Void>() {
                 @Override
                 public void onSucesso(Void resultado) {
                     if (isFinishing() || isDestroyed()) return;
@@ -180,9 +219,36 @@ public class EditarPerfilActivity extends AppCompatActivity {
 
         String categoria = CATEGORIAS[spinnerCategoria.getSelectedItemPosition()];
 
+        String whatsapp = edtWhatsapp.getText().toString().trim();
+        String instagram = edtInstagram.getText().toString().trim();
+        String telefone = edtTelefone.getText().toString().trim();
+        String emailContato = edtEmailContato.getText().toString().trim();
+
+        if (whatsapp.length() > 30) {
+            aviso("O WhatsApp pode ter no máximo 30 caracteres");
+            return;
+        }
+        if (instagram.length() > 150) {
+            aviso("O Instagram pode ter no máximo 150 caracteres");
+            return;
+        }
+        if (telefone.length() > 30) {
+            aviso("O telefone pode ter no máximo 30 caracteres");
+            return;
+        }
+        if (emailContato.length() > 120) {
+            aviso("O e-mail pode ter no máximo 120 caracteres");
+            return;
+        }
+        if (!emailContato.isEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(emailContato).matches()) {
+            aviso("Informe um e-mail de contato válido");
+            return;
+        }
+
         btnSalvar.setEnabled(false);
         FreelancerRepository.salvarMeuPerfil(nome, !nome.equals(nomeOriginal), area, categoria,
-                habilidades, disponivel, disponibilidade, atual, new Callback<Boolean>() {
+                habilidades, disponivel, disponibilidade, whatsapp, instagram, telefone,
+                emailContato, atual, new Callback<Boolean>() {
                     @Override
                     public void onSucesso(Boolean precisaAprovacao) {
                         if (isFinishing() || isDestroyed()) return;

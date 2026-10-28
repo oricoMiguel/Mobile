@@ -72,6 +72,10 @@ public class FreelancerRepository {
                     String categoria = doc.getString("categoria");
                     String disponibilidade = doc.getString("disponibilidade");
                     String status = doc.getString("status");
+                    String whatsapp = doc.getString("whatsapp");
+                    String instagram = doc.getString("instagram");
+                    String telefone = doc.getString("telefone");
+                    String emailContato = doc.getString("emailContato");
 
                     callback.onSucesso(new PerfilProfissional(
                             nome == null ? "" : nome,
@@ -80,7 +84,8 @@ public class FreelancerRepository {
                             listaDeTexto(doc.get("habilidades")),
                             Boolean.TRUE.equals(doc.getBoolean("disponivel")),
                             disponibilidade == null ? "" : disponibilidade,
-                            status == null ? "pendente" : status));
+                            status == null ? "pendente" : status,
+                            whatsapp, instagram, telefone, emailContato));
                 })
                 .addOnFailureListener(callback::onErro);
     }
@@ -89,7 +94,8 @@ public class FreelancerRepository {
     // (de novo) da aprovação de um admin.
     public static void salvarMeuPerfil(String nome, boolean nomeMudou, String area, String categoria,
                                        List<String> habilidades, boolean disponivel,
-                                       String disponibilidade, PerfilProfissional atual,
+                                       String disponibilidade, String whatsapp, String instagram,
+                                       String telefone, String emailContato, PerfilProfissional atual,
                                        Callback<Boolean> callback) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
@@ -114,6 +120,10 @@ public class FreelancerRepository {
         campos.put("habilidades", habilidades);
         campos.put("disponivel", disponivel);
         campos.put("disponibilidade", disponibilidade);
+        campos.put("whatsapp", whatsapp == null ? "" : whatsapp.trim());
+        campos.put("instagram", instagram == null ? "" : instagram.trim());
+        campos.put("telefone", telefone == null ? "" : telefone.trim());
+        campos.put("emailContato", emailContato == null ? "" : emailContato.trim());
 
         if (atual == null) {
             campos.put("status", "pendente");
@@ -165,7 +175,11 @@ public class FreelancerRepository {
                 disponivel,
                 disponibilidade,
                 corPorCategoria(categoria),
-                criadoEm == null ? 0 : criadoEm.toDate().getTime());
+                criadoEm == null ? 0 : criadoEm.toDate().getTime(),
+                doc.getString("whatsapp"),
+                doc.getString("instagram"),
+                doc.getString("telefone"),
+                doc.getString("emailContato"));
     }
 
     private static List<String> listaDeTexto(Object valor) {

@@ -197,6 +197,43 @@
                         </HorizontalScrollView>
                     </LinearLayout>
 
+                    <!-- Formas de contato: só aparece quando houver pelo menos um contato preenchido -->
+                    <LinearLayout
+                        android:id="@+id/secaoContato"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_card_opcao"
+                        android:orientation="vertical"
+                        android:padding="16dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Formas de contato"
+                            android:textColor="@color/eq_escuro"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Toque em uma opção para entrar em contato."
+                            android:textColor="@color/eq_texto_claro"
+                            android:textSize="13sp" />
+
+                        <LinearLayout
+                            android:id="@+id/listaContatos"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:orientation="vertical" />
+                    </LinearLayout>
+
                     <TextView
                         android:id="@+id/txtMembroDesde"
                         android:layout_width="match_parent"
@@ -205,6 +242,20 @@
                         android:gravity="center"
                         android:textColor="@color/eq_texto_claro"
                         android:textSize="13sp" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnContratar"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_botao_escuro"
+                        android:text="Contratar"
+                        android:textAllCaps="false"
+                        android:textColor="@color/branco"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>

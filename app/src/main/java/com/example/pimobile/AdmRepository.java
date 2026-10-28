@@ -25,7 +25,9 @@ public class AdmRepository {
         Task<AggregateQuerySnapshot> pods =
                 db.collection("skillPods").count().get(AggregateSource.SERVER);
         Task<AggregateQuerySnapshot> equipesPendentes =
-                db.collection("equipes").whereEqualTo("status", "pendente")
+                db.collection("equipes")
+                        .whereEqualTo("formato", "skillPod")
+                        .whereEqualTo("status", "pendente")
                         .count().get(AggregateSource.SERVER);
         Task<AggregateQuerySnapshot> participacoesPendentes =
                 db.collection("participacoes").whereEqualTo("status", "pendente")

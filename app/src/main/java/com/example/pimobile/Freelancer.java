@@ -15,10 +15,15 @@ public class Freelancer {
     private final String disponibilidade;
     private final int cor;
     private final long criadoEm; // milissegundos; 0 se não houver data
+    private final String whatsapp;
+    private final String instagram;
+    private final String telefone;
+    private final String emailContato;
 
     public Freelancer(String id, String nome, String area, String categoria, double nota,
                       List<String> habilidades, boolean disponivel,
-                      String disponibilidade, int cor, long criadoEm) {
+                      String disponibilidade, int cor, long criadoEm,
+                      String whatsapp, String instagram, String telefone, String emailContato) {
         this.id = id;
         this.nome = nome;
         this.area = area;
@@ -29,6 +34,10 @@ public class Freelancer {
         this.disponibilidade = disponibilidade;
         this.cor = cor;
         this.criadoEm = criadoEm;
+        this.whatsapp = whatsapp == null ? "" : whatsapp;
+        this.instagram = instagram == null ? "" : instagram;
+        this.telefone = telefone == null ? "" : telefone;
+        this.emailContato = emailContato == null ? "" : emailContato;
     }
 
     public String getId() { return id; }
@@ -41,6 +50,10 @@ public class Freelancer {
     public String getDisponibilidade() { return disponibilidade; }
     public int getCor() { return cor; }
     public long getCriadoEm() { return criadoEm; }
+    public String getWhatsapp() { return whatsapp; }
+    public String getInstagram() { return instagram; }
+    public String getTelefone() { return telefone; }
+    public String getEmailContato() { return emailContato; }
 
     public String getIniciais() {
         String limpo = nome == null ? "" : nome.trim();

@@ -227,7 +227,7 @@ public class AreaAdmRepository {
                     aviso.put("mensagem", aprovada
                             ? "Você agora faz parte do " + (podNome == null ? "pod" : podNome) + "."
                             : "Seu pedido para entrar no " + (podNome == null ? "pod" : podNome)
-                              + " não foi aprovado desta vez.");
+                            + " não foi aprovado desta vez.");
                     aviso.put("lida", false);
                     aviso.put("criadoEm", FieldValue.serverTimestamp());
                     transacao.set(db.collection("notificacoes").document(), aviso);
@@ -436,9 +436,9 @@ public class AreaAdmRepository {
                         aviso.put("titulo", aprovada ? "Seu pod foi aprovado" : "Proposta de pod recusada");
                         aviso.put("mensagem", aprovada
                                 ? "O " + nomePod + " já está no catálogo."
-                                  + (primeiroMembro
-                                        ? " Você é o primeiro membro."
-                                        : " Ele aparece como \"Em formação\" até um freelancer entrar.")
+                                + (primeiroMembro
+                                ? " Você é o primeiro membro."
+                                : " Ele aparece como \"Em formação\" até um freelancer entrar.")
                                 : "Sua proposta do " + nomePod + " não foi aprovada desta vez.");
                         aviso.put("lida", false);
                         aviso.put("criadoEm", FieldValue.serverTimestamp());
@@ -482,7 +482,11 @@ public class AreaAdmRepository {
                                 List<RegistroAdm> lista = new ArrayList<>();
 
                                 for (DocumentSnapshot doc : docs) {
-                                    String podNome = doc.getString("podNome");
+                                    boolean freelancer = "freelancer".equals(doc.getString("formato"));
+                                    if (freelancer) continue; // o freelancer decide o próprio pedido
+                                    String podNome = freelancer
+                                            ? doc.getString("freelancerNome")
+                                            : doc.getString("podNome");
                                     String tipo = doc.getString("tipo");
                                     String status = doc.getString("status");
                                     Long pessoas = doc.getLong("pessoas");
@@ -502,8 +506,10 @@ public class AreaAdmRepository {
                                         badgeTipo = 1;
                                     }
 
-                                    String detalhe = (tipo == null ? "" : tipo + " · ")
-                                            + (pessoas == null ? 0 : pessoas.intValue()) + " pessoas"
+                                    int nPessoas = pessoas == null ? 0 : pessoas.intValue();
+                                    String detalhe = (freelancer ? "Freelancer · "
+                                            : (tipo == null ? "" : tipo + " · "))
+                                            + (nPessoas == 1 ? "1 pessoa" : nPessoas + " pessoas")
                                             + (criadoEm == null ? "" : " · " + formato.format(criadoEm.toDate()));
 
                                     lista.add(new RegistroAdm(
@@ -533,7 +539,9 @@ public class AreaAdmRepository {
         equipeRef.get()
                 .addOnSuccessListener(doc -> {
                     String usuarioId = doc.getString("usuarioId");
-                    String podNome = doc.getString("podNome");
+                    String podNome = "freelancer".equals(doc.getString("formato"))
+                            ? doc.getString("freelancerNome")
+                            : doc.getString("podNome");
                     boolean aprovada = "aprovada".equals(status);
 
                     WriteBatch batch = db.batch();
