@@ -13,6 +13,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
+
 import com.google.firebase.auth.FirebaseAuth;
 
 public class PerfilActivity extends AppCompatActivity {
@@ -71,8 +73,43 @@ public class PerfilActivity extends AppCompatActivity {
     }
 
     private void preencher(Perfil perfil) {
-        ((TextView) findViewById(R.id.txtIniciais))
-                .setText(perfil.getIniciais());
+        TextView txtIniciais = findViewById(R.id.txtIniciais);
+        txtIniciais.setText(perfil.getIniciais());
+
+        ImageView imgFotoPerfil = findViewById(R.id.imgFotoPerfil);
+        String fotoUsuario = perfil.getFotoUrl();
+        if (fotoUsuario != null && !fotoUsuario.trim().isEmpty()) {
+            Glide.with(PerfilActivity.this).load(fotoUsuario).circleCrop().into(imgFotoPerfil);
+            imgFotoPerfil.setVisibility(View.VISIBLE);
+            txtIniciais.setVisibility(View.GONE);
+        } else {
+            imgFotoPerfil.setVisibility(View.GONE);
+            txtIniciais.setVisibility(View.VISIBLE);
+        }
+
+        // Mantém compatibilidade com fotos antigas de freelancers que foram salvas
+        // apenas no documento /freelancers/{uid}.
+        if ("Freelancer".equals(perfil.getTipoConta())) {
+            FreelancerRepository.getMeuPerfil(new Callback<PerfilProfissional>() {
+                @Override
+                public void onSucesso(PerfilProfissional profissional) {
+                    if (isFinishing() || isDestroyed()) return;
+                    if (profissional != null && profissional.getFotoUrl() != null
+                            && !profissional.getFotoUrl().trim().isEmpty()) {
+                        Glide.with(PerfilActivity.this)
+                                .load(profissional.getFotoUrl())
+                                .circleCrop()
+                                .into(imgFotoPerfil);
+                        imgFotoPerfil.setVisibility(View.VISIBLE);
+                        txtIniciais.setVisibility(View.GONE);
+                    }
+                }
+                @Override
+                public void onErro(Exception e) {
+                    // Se já existe foto em /usuarios, ela permanece visível; senão ficam as iniciais.
+                }
+            });
+        }
 
         ((TextView) findViewById(R.id.txtNome))
                 .setText(perfil.getNome());

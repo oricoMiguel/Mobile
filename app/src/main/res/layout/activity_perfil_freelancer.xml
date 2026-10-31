@@ -55,6 +55,14 @@
                         android:gravity="center"
                         android:textSize="42sp"
                         android:textStyle="bold" />
+
+                    <ImageView
+                        android:id="@+id/imgFotoPerfil"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:contentDescription="Foto do freelancer"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone" />
                 </FrameLayout>
 
                 <TextView
@@ -256,6 +264,21 @@
                         android:textColor="@color/branco"
                         android:textSize="16sp"
                         android:textStyle="bold" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnAvaliar"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_botao_escuro"
+                        android:text="Avaliar freelancer"
+                        android:textAllCaps="false"
+                        android:textColor="@color/branco"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>

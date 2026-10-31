@@ -74,6 +74,14 @@
                         android:textSize="42sp"
                         android:textStyle="bold" />
 
+                    <ImageView
+                        android:id="@+id/imgFotoPerfil"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:contentDescription="Foto de perfil"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone" />
+
                     <FrameLayout
                         android:id="@+id/badgeVerificado"
                         android:layout_width="32dp"

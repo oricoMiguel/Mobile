@@ -87,9 +87,25 @@ public class EquipeRepository {
                     equipe.put("status", "pendente");
                     equipe.put("criadoEm", FieldValue.serverTimestamp());
 
-                    db.collection(COLECAO)
-                            .add(equipe)
-                            .addOnSuccessListener(ref -> callback.onSucesso(ref.getId()))
+                    // Salva o pedido e cria a notificação do freelancer na mesma operação.
+                    // Assim, não fica pedido sem aviso se uma das gravações falhar.
+                    DocumentReference equipeRef = db.collection(COLECAO).document();
+                    DocumentReference notificacaoRef = db.collection("notificacoes").document();
+
+                    Map<String, Object> aviso = new HashMap<>();
+                    aviso.put("usuarioId", freelancerId);
+                    aviso.put("equipeId", equipeRef.getId());
+                    aviso.put("titulo", "Novo pedido de contratação");
+                    aviso.put("mensagem", nome + " quer contratar você.");
+                    aviso.put("lida", false);
+                    aviso.put("tipo", "pedido_contratacao");
+                    aviso.put("criadoEm", FieldValue.serverTimestamp());
+
+                    WriteBatch batch = db.batch();
+                    batch.set(equipeRef, equipe);
+                    batch.set(notificacaoRef, aviso);
+                    batch.commit()
+                            .addOnSuccessListener(resultado -> callback.onSucesso(equipeRef.getId()))
                             .addOnFailureListener(callback::onErro);
                 })
                 .addOnFailureListener(callback::onErro);
@@ -170,7 +186,10 @@ public class EquipeRepository {
 
                         String badge;
                         int badgeTipo;
-                        if ("aprovada".equals(status)) {
+                        if ("concluida".equals(status)) {
+                            badge = "Concluído";
+                            badgeTipo = 0;
+                        } else if ("aprovada".equals(status)) {
                             badge = "Aceito";
                             badgeTipo = 0;
                         } else if ("recusada".equals(status)) {

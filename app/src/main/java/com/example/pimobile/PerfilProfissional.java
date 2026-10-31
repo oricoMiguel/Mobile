@@ -15,10 +15,19 @@ public class PerfilProfissional {
     private final String instagram;
     private final String telefone;
     private final String emailContato;
+    private final String fotoUrl;
+    private final String fotoPublicId;
 
     public PerfilProfissional(String nome, String area, String categoria, List<String> habilidades,
                               boolean disponivel, String disponibilidade, String status,
                               String whatsapp, String instagram, String telefone, String emailContato) {
+        this(nome, area, categoria, habilidades, disponivel, disponibilidade, status, whatsapp, instagram, telefone, emailContato, "", "");
+    }
+
+    public PerfilProfissional(String nome, String area, String categoria, List<String> habilidades,
+                              boolean disponivel, String disponibilidade, String status,
+                              String whatsapp, String instagram, String telefone, String emailContato,
+                              String fotoUrl, String fotoPublicId) {
         this.nome = nome;
         this.area = area;
         this.categoria = categoria;
@@ -30,6 +39,8 @@ public class PerfilProfissional {
         this.instagram = instagram == null ? "" : instagram;
         this.telefone = telefone == null ? "" : telefone;
         this.emailContato = emailContato == null ? "" : emailContato;
+        this.fotoUrl = fotoUrl == null ? "" : fotoUrl;
+        this.fotoPublicId = fotoPublicId == null ? "" : fotoPublicId;
     }
 
     public String getNome() { return nome; }
@@ -43,4 +54,6 @@ public class PerfilProfissional {
     public String getInstagram() { return instagram; }
     public String getTelefone() { return telefone; }
     public String getEmailContato() { return emailContato; }
+    public String getFotoUrl() { return fotoUrl; }
+    public String getFotoPublicId() { return fotoPublicId; }
 }

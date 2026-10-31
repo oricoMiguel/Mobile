@@ -39,9 +39,17 @@ public class PerfilRepository {
                     callback.onSucesso(new Perfil(
                             nome, email, tipoConta, verificado, mensagens,
                             doc.getString("telefone"), doc.getString("empresa"),
-                            doc.getString("cidade"), doc.getString("estado")));
+                            doc.getString("cidade"), doc.getString("estado"),
+                            doc.getString("fotoUrl"), doc.getString("fotoPublicId")));
                 })
                 .addOnFailureListener(callback::onErro);
+    }
+
+    public static void atualizarFotoUsuario(String fotoUrl, String fotoPublicId, Callback<Void> callback) {
+        Map<String, Object> campos = new HashMap<>();
+        campos.put("fotoUrl", fotoUrl == null ? "" : fotoUrl);
+        campos.put("fotoPublicId", fotoPublicId == null ? "" : fotoPublicId);
+        atualizarCampos(campos, callback);
     }
 
     public static void atualizarNome(String nome, Callback<Void> callback) {

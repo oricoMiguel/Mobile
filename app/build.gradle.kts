@@ -47,4 +47,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation("com.cloudinary:cloudinary-android:3.1.1")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
 }

@@ -24,6 +24,14 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <ImageView
+                android:id="@+id/imgFotoPerfil"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Foto do freelancer"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
             <View
                 android:id="@+id/dotStatus"
                 android:layout_width="14dp"

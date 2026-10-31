@@ -85,9 +85,21 @@ public class FreelancerRepository {
                             Boolean.TRUE.equals(doc.getBoolean("disponivel")),
                             disponibilidade == null ? "" : disponibilidade,
                             status == null ? "pendente" : status,
-                            whatsapp, instagram, telefone, emailContato));
+                            whatsapp, instagram, telefone, emailContato,
+                            doc.getString("fotoUrl"), doc.getString("fotoPublicId")));
                 })
                 .addOnFailureListener(callback::onErro);
+    }
+
+
+    public static void atualizarFotoPerfil(String fotoUrl, String fotoPublicId, Callback<Void> callback) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) { callback.onErro(new IllegalStateException("Nenhum usuário logado")); return; }
+        Map<String, Object> campos = new HashMap<>();
+        campos.put("fotoUrl", fotoUrl == null ? "" : fotoUrl);
+        campos.put("fotoPublicId", fotoPublicId == null ? "" : fotoPublicId);
+        FirebaseFirestore.getInstance().collection(COLECAO).document(user.getUid()).update(campos)
+                .addOnSuccessListener(x -> callback.onSucesso(null)).addOnFailureListener(callback::onErro);
     }
 
     // Cria ou atualiza o perfil. O callback devolve true quando o perfil precisa
@@ -95,8 +107,8 @@ public class FreelancerRepository {
     public static void salvarMeuPerfil(String nome, boolean nomeMudou, String area, String categoria,
                                        List<String> habilidades, boolean disponivel,
                                        String disponibilidade, String whatsapp, String instagram,
-                                       String telefone, String emailContato, PerfilProfissional atual,
-                                       Callback<Boolean> callback) {
+                                       String telefone, String emailContato, String fotoUrl, String fotoPublicId,
+                                       PerfilProfissional atual, Callback<Boolean> callback) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
             callback.onErro(new IllegalStateException("Nenhum usuário logado"));
@@ -124,6 +136,8 @@ public class FreelancerRepository {
         campos.put("instagram", instagram == null ? "" : instagram.trim());
         campos.put("telefone", telefone == null ? "" : telefone.trim());
         campos.put("emailContato", emailContato == null ? "" : emailContato.trim());
+        campos.put("fotoUrl", fotoUrl == null ? "" : fotoUrl);
+        campos.put("fotoPublicId", fotoPublicId == null ? "" : fotoPublicId);
 
         if (atual == null) {
             campos.put("status", "pendente");
@@ -179,7 +193,9 @@ public class FreelancerRepository {
                 doc.getString("whatsapp"),
                 doc.getString("instagram"),
                 doc.getString("telefone"),
-                doc.getString("emailContato"));
+                doc.getString("emailContato"),
+                doc.getString("fotoUrl"),
+                doc.getString("fotoPublicId"));
     }
 
     private static List<String> listaDeTexto(Object valor) {

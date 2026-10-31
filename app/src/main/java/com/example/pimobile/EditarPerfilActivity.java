@@ -1,6 +1,9 @@
 package com.example.pimobile;
 
 import android.os.Bundle;
+import android.content.Intent;
+import android.net.Uri;
+import android.widget.ImageView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -11,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import com.bumptech.glide.Glide;
 import androidx.appcompat.widget.SwitchCompat;
 
 import java.util.ArrayList;
@@ -26,7 +30,11 @@ public class EditarPerfilActivity extends AppCompatActivity {
     private Spinner spinnerCategoria;
     private SwitchCompat switchDisponivel;
     private TextView txtStatus;
-    private Button btnSalvar;
+    private Button btnSalvar, btnEscolherFoto;
+    private ImageView imgFotoPerfil;
+    private String fotoUrlAtual = "";
+    private String fotoPublicIdAtual = "";
+    private static final int PEDIR_FOTO = 721;
     private View secaoProfissional, secaoUsuario;
 
     private String nomeOriginal = "";
@@ -51,6 +59,9 @@ public class EditarPerfilActivity extends AppCompatActivity {
         switchDisponivel = findViewById(R.id.switchDisponivel);
         txtStatus = findViewById(R.id.txtStatus);
         btnSalvar = findViewById(R.id.btnSalvar);
+        imgFotoPerfil = findViewById(R.id.imgFotoPerfil);
+        btnEscolherFoto = findViewById(R.id.btnEscolherFoto);
+        btnEscolherFoto.setOnClickListener(v -> escolherFoto());
         secaoProfissional = findViewById(R.id.secaoProfissional);
         secaoUsuario = findViewById(R.id.secaoUsuario);
         edtTelefoneUsuario = findViewById(R.id.edtTelefoneUsuario);
@@ -73,6 +84,10 @@ public class EditarPerfilActivity extends AppCompatActivity {
                 if (isFinishing() || isDestroyed()) return;
                 nomeOriginal = perfil.getNome();
                 edtNome.setText(perfil.getNome());
+                fotoUrlAtual = perfil.getFotoUrl();
+                fotoPublicIdAtual = perfil.getFotoPublicId();
+                mostrarFoto(fotoUrlAtual);
+                btnEscolherFoto.setText(fotoUrlAtual.isEmpty() ? "Escolher foto" : "Trocar foto");
 
                 ehFreelancer = "Freelancer".equals(perfil.getTipoConta());
                 if (ehFreelancer) {
@@ -115,6 +130,11 @@ public class EditarPerfilActivity extends AppCompatActivity {
                     edtInstagram.setText(perfil.getInstagram());
                     edtTelefone.setText(perfil.getTelefone());
                     edtEmailContato.setText(perfil.getEmailContato());
+                    if (perfil.getFotoUrl() != null && !perfil.getFotoUrl().trim().isEmpty()) {
+                        fotoUrlAtual = perfil.getFotoUrl();
+                        fotoPublicIdAtual = perfil.getFotoPublicId();
+                        mostrarFoto(fotoUrlAtual);
+                    }
                     txtStatus.setText(textoStatus(perfil.getStatus()));
                 } else {
                     switchDisponivel.setChecked(true);
@@ -132,6 +152,80 @@ public class EditarPerfilActivity extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void escolherFoto() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(Intent.createChooser(intent, "Escolher foto de perfil"), PEDIR_FOTO);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != PEDIR_FOTO || resultCode != RESULT_OK || data == null || data.getData() == null) return;
+        Uri uri = data.getData();
+        btnEscolherFoto.setEnabled(false);
+        btnEscolherFoto.setText("Enviando foto...");
+        CloudinaryUploader.enviar(this, uri, new CloudinaryUploader.CallbackUpload() {
+            @Override public void onSucesso(String secureUrl, String publicId) {
+                if (isFinishing() || isDestroyed()) return;
+                // Toda conta guarda a foto no documento /usuarios/{uid}.
+                // Para freelancers, também atualizamos /freelancers/{uid} para os cards de Serviços.
+                PerfilRepository.atualizarFotoUsuario(secureUrl, publicId, new Callback<Void>() {
+                    @Override public void onSucesso(Void resultado) {
+                        if (isFinishing() || isDestroyed()) return;
+                        fotoUrlAtual = secureUrl;
+                        fotoPublicIdAtual = publicId;
+                        mostrarFoto(fotoUrlAtual);
+
+                        if (ehFreelancer && atual != null) {
+                            FreelancerRepository.atualizarFotoPerfil(secureUrl, publicId, new Callback<Void>() {
+                                @Override public void onSucesso(Void resultadoProfissional) {
+                                    if (isFinishing() || isDestroyed()) return;
+                                    btnEscolherFoto.setEnabled(true);
+                                    btnEscolherFoto.setText("Trocar foto");
+                                    aviso("Foto de perfil atualizada");
+                                }
+                                @Override public void onErro(Exception e) {
+                                    if (isFinishing() || isDestroyed()) return;
+                                    btnEscolherFoto.setEnabled(true);
+                                    btnEscolherFoto.setText("Trocar foto");
+                                    aviso("Foto salva no perfil, mas não foi atualizada em Serviços. Tente salvar o perfil novamente.");
+                                }
+                            });
+                        } else {
+                            btnEscolherFoto.setEnabled(true);
+                            btnEscolherFoto.setText("Trocar foto");
+                            aviso(ehFreelancer
+                                    ? "Foto salva. Toque em Salvar para concluir seu perfil profissional."
+                                    : "Foto de perfil atualizada");
+                        }
+                    }
+                    @Override public void onErro(Exception e) {
+                        if (isFinishing() || isDestroyed()) return;
+                        btnEscolherFoto.setEnabled(true);
+                        btnEscolherFoto.setText("Escolher foto");
+                        aviso("A foto foi enviada, mas não foi salva no perfil. Confira as regras do Firestore.");
+                    }
+                });
+            }
+            @Override public void onErro(Exception e) {
+                if (isFinishing() || isDestroyed()) return;
+                btnEscolherFoto.setEnabled(true);
+                btnEscolherFoto.setText("Escolher foto");
+                aviso("Não foi possível enviar a foto. Confira o Upload Preset.");
+            }
+        });
+    }
+
+    private void mostrarFoto(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            imgFotoPerfil.setImageDrawable(null);
+            return;
+        }
+        Glide.with(this).load(url).circleCrop().into(imgFotoPerfil);
     }
 
     private void salvar() {
@@ -248,7 +342,7 @@ public class EditarPerfilActivity extends AppCompatActivity {
         btnSalvar.setEnabled(false);
         FreelancerRepository.salvarMeuPerfil(nome, !nome.equals(nomeOriginal), area, categoria,
                 habilidades, disponivel, disponibilidade, whatsapp, instagram, telefone,
-                emailContato, atual, new Callback<Boolean>() {
+                emailContato, fotoUrlAtual, fotoPublicIdAtual, atual, new Callback<Boolean>() {
                     @Override
                     public void onSucesso(Boolean precisaAprovacao) {
                         if (isFinishing() || isDestroyed()) return;

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -102,8 +103,44 @@ public class MinhasEquipesActivity extends AppCompatActivity {
             configurarStatus(card.findViewById(R.id.txtStatus), equipe.getStatus(),
                     equipe.isFreelancer());
 
-            listaEquipes.addView(card);
+            if (equipe.isFreelancer() && "aprovada".equals(equipe.getStatus())) {
+                LinearLayout grupo = new LinearLayout(this);
+                grupo.setOrientation(LinearLayout.VERTICAL);
+                grupo.addView(card);
+                Button btnConcluir = new Button(this);
+                btnConcluir.setText("Marcar serviço como concluído");
+                btnConcluir.setAllCaps(false);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                lp.bottomMargin = dp(12);
+                btnConcluir.setLayoutParams(lp);
+                btnConcluir.setOnClickListener(v -> new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setTitle("Concluir serviço")
+                        .setMessage("Confirma que o serviço com " + equipe.getPodNome() + " foi concluído? Depois disso, você poderá avaliar o freelancer.")
+                        .setNegativeButton("Cancelar", null)
+                        .setPositiveButton("Confirmar", (dialog, which) -> {
+                            btnConcluir.setEnabled(false);
+                            AvaliacaoRepository.concluirPedido(equipe.getId(), new Callback<Void>() {
+                                @Override public void onSucesso(Void ignorado) {
+                                    Toast.makeText(MinhasEquipesActivity.this, "Serviço concluído. Você já pode avaliar o freelancer.", Toast.LENGTH_LONG).show();
+                                    carregarEquipes();
+                                }
+                                @Override public void onErro(Exception e) {
+                                    btnConcluir.setEnabled(true);
+                                    Toast.makeText(MinhasEquipesActivity.this, "Não foi possível concluir o serviço. Confira as regras do Firebase.", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }).show());
+                grupo.addView(btnConcluir);
+                listaEquipes.addView(grupo);
+            } else {
+                listaEquipes.addView(card);
+            }
         }
+    }
+
+    private int dp(int valor) {
+        return Math.round(valor * getResources().getDisplayMetrics().density);
     }
 
     // Pedido de freelancer: o freelancer "aceita"; pedido de pod: o admin "aprova"
@@ -111,6 +148,11 @@ public class MinhasEquipesActivity extends AppCompatActivity {
         switch (status) {
             case "aprovada":
                 chip.setText(freelancer ? "Aceita" : "Aprovada");
+                chip.setBackgroundResource(R.drawable.bg_tag_verde);
+                chip.setTextColor(ContextCompat.getColor(this, R.color.texto_verde));
+                break;
+            case "concluida":
+                chip.setText("Concluída");
                 chip.setBackgroundResource(R.drawable.bg_tag_verde);
                 chip.setTextColor(ContextCompat.getColor(this, R.color.texto_verde));
                 break;

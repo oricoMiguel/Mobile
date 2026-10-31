@@ -11,10 +11,13 @@ public class Perfil {
     private final String empresa;
     private final String cidade;
     private final String estado;
+    private final String fotoUrl;
+    private final String fotoPublicId;
 
     public Perfil(String nome, String email, String tipoConta,
                   boolean verificado, int mensagensNaoLidas,
-                  String telefone, String empresa, String cidade, String estado) {
+                  String telefone, String empresa, String cidade, String estado,
+                  String fotoUrl, String fotoPublicId) {
         this.nome = nome;
         this.email = email;
         this.tipoConta = tipoConta;
@@ -24,6 +27,8 @@ public class Perfil {
         this.empresa = empresa == null ? "" : empresa;
         this.cidade = cidade == null ? "" : cidade;
         this.estado = estado == null ? "" : estado;
+        this.fotoUrl = fotoUrl == null ? "" : fotoUrl;
+        this.fotoPublicId = fotoPublicId == null ? "" : fotoPublicId;
     }
 
     public String getNome() { return nome; }
@@ -35,6 +40,8 @@ public class Perfil {
     public String getEmpresa() { return empresa; }
     public String getCidade() { return cidade; }
     public String getEstado() { return estado; }
+    public String getFotoUrl() { return fotoUrl; }
+    public String getFotoPublicId() { return fotoPublicId; }
 
     public String getIniciais() {
         String nomeSeguro = nome == null || nome.trim().isEmpty() ? "U" : nome.trim();

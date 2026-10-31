@@ -94,6 +94,73 @@
                     android:textSize="16sp" />
             </FrameLayout>
 
+            <!-- Foto de perfil disponível para todos os tipos de conta -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <FrameLayout
+                        android:layout_width="84dp"
+                        android:layout_height="84dp">
+
+                        <TextView
+                            android:layout_width="84dp"
+                            android:layout_height="84dp"
+                            android:background="@drawable/bg_avatar_roxo"
+                            android:gravity="center"
+                            android:text="+"
+                            android:textColor="@color/roxo_icone"
+                            android:textSize="30sp" />
+
+                        <ImageView
+                            android:id="@+id/imgFotoPerfil"
+                            android:layout_width="84dp"
+                            android:layout_height="84dp"
+                            android:contentDescription="Foto de perfil"
+                            android:scaleType="centerCrop" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Foto de perfil"
+                            android:textColor="@color/eq_escuro"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Sua foto aparece no seu perfil. Para freelancers, também aparece em Serviços."
+                            android:textColor="@color/eq_texto_claro"
+                            android:textSize="12sp" />
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btnEscolherFoto"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/bg_botao_escuro"
+                            android:paddingHorizontal="14dp"
+                            android:text="Escolher foto"
+                            android:textAllCaps="false"
+                            android:textColor="@color/branco"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+
             <!-- Campos específicos da conta de usuário/contratante -->
             <LinearLayout
                 android:id="@+id/secaoUsuario"

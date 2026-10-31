@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+import com.bumptech.glide.Glide;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,7 +68,17 @@ public class ServicoActivity extends AppCompatActivity {
             public void onSucesso(List<Freelancer> freelancers) {
                 if (isFinishing() || isDestroyed()) return;
                 todos = freelancers;
-                renderizarFreelancers();
+                AvaliacaoRepository.aplicarMedias(todos, new Callback<Void>() {
+                    @Override public void onSucesso(Void ignorado) {
+                        if (!isFinishing() && !isDestroyed()) renderizarFreelancers();
+                    }
+                    @Override public void onErro(Exception e) {
+                        if (!isFinishing() && !isDestroyed()) {
+                            for (Freelancer freelancer : todos) freelancer.setNota(0.0);
+                            renderizarFreelancers();
+                        }
+                    }
+                });
             }
 
             @Override
@@ -90,6 +102,7 @@ public class ServicoActivity extends AppCompatActivity {
             View card = inflater.inflate(R.layout.item_freelancer, listaFreelancers, false);
 
             TextView txtIniciais = card.findViewById(R.id.txtIniciais);
+            ImageView imgFoto = card.findViewById(R.id.imgFotoPerfil);
             View dotStatus = card.findViewById(R.id.dotStatus);
             TextView txtNome = card.findViewById(R.id.txtNome);
             TextView txtArea = card.findViewById(R.id.txtArea);
@@ -102,6 +115,14 @@ public class ServicoActivity extends AppCompatActivity {
             txtIniciais.setText(f.getIniciais());
             txtIniciais.setBackgroundResource(fundoAvatar[cor]);
             txtIniciais.setTextColor(ContextCompat.getColor(this, corTexto[cor]));
+            if (f.getFotoUrl() != null && !f.getFotoUrl().trim().isEmpty()) {
+                Glide.with(this).load(f.getFotoUrl()).circleCrop().into(imgFoto);
+                imgFoto.setVisibility(View.VISIBLE);
+                txtIniciais.setVisibility(View.GONE);
+            } else {
+                imgFoto.setVisibility(View.GONE);
+                txtIniciais.setVisibility(View.VISIBLE);
+            }
 
             dotStatus.setBackgroundResource(f.isDisponivel()
                     ? R.drawable.bg_dot_verde : R.drawable.bg_dot_laranja);
@@ -109,7 +130,8 @@ public class ServicoActivity extends AppCompatActivity {
             txtNome.setText(f.getNome());
             txtArea.setText(f.getArea());
             txtNota.setText(f.getNota() > 0
-                    ? String.format(Locale.US, "%.1f", f.getNota()) : "Novo");
+                    ? String.format(Locale.US, "%.1f", f.getNota())
+                    : (f.isNovo() ? "Novo" : "Sem avaliações"));
 
             txtDisponibilidade.setText(f.getDisponibilidade());
             txtDisponibilidade.setTextColor(ContextCompat.getColor(this,

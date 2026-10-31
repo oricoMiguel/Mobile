@@ -9,7 +9,7 @@ public class Freelancer {
     private final String nome;
     private final String area;
     private final String categoria;
-    private final double nota;
+    private double nota;
     private final List<String> habilidades;
     private final boolean disponivel;
     private final String disponibilidade;
@@ -19,11 +19,20 @@ public class Freelancer {
     private final String instagram;
     private final String telefone;
     private final String emailContato;
+    private final String fotoUrl;
+    private final String fotoPublicId;
 
     public Freelancer(String id, String nome, String area, String categoria, double nota,
                       List<String> habilidades, boolean disponivel,
                       String disponibilidade, int cor, long criadoEm,
                       String whatsapp, String instagram, String telefone, String emailContato) {
+        this(id, nome, area, categoria, nota, habilidades, disponivel, disponibilidade, cor, criadoEm, whatsapp, instagram, telefone, emailContato, "", "");
+    }
+
+    public Freelancer(String id, String nome, String area, String categoria, double nota,
+                      List<String> habilidades, boolean disponivel, String disponibilidade,
+                      int cor, long criadoEm, String whatsapp, String instagram, String telefone,
+                      String emailContato, String fotoUrl, String fotoPublicId) {
         this.id = id;
         this.nome = nome;
         this.area = area;
@@ -38,6 +47,8 @@ public class Freelancer {
         this.instagram = instagram == null ? "" : instagram;
         this.telefone = telefone == null ? "" : telefone;
         this.emailContato = emailContato == null ? "" : emailContato;
+        this.fotoUrl = fotoUrl == null ? "" : fotoUrl;
+        this.fotoPublicId = fotoPublicId == null ? "" : fotoPublicId;
     }
 
     public String getId() { return id; }
@@ -45,6 +56,11 @@ public class Freelancer {
     public String getArea() { return area; }
     public String getCategoria() { return categoria; }
     public double getNota() { return nota; }
+    public void setNota(double nota) { this.nota = nota; }
+
+    public boolean isNovo() {
+        return criadoEm > 0 && System.currentTimeMillis() - criadoEm <= 30L * 24 * 60 * 60 * 1000;
+    }
     public List<String> getHabilidades() { return habilidades; }
     public boolean isDisponivel() { return disponivel; }
     public String getDisponibilidade() { return disponibilidade; }
@@ -54,6 +70,8 @@ public class Freelancer {
     public String getInstagram() { return instagram; }
     public String getTelefone() { return telefone; }
     public String getEmailContato() { return emailContato; }
+    public String getFotoUrl() { return fotoUrl; }
+    public String getFotoPublicId() { return fotoPublicId; }
 
     public String getIniciais() {
         String limpo = nome == null ? "" : nome.trim();

@@ -84,13 +84,17 @@ public class NotificacoesActivity extends AppCompatActivity {
                     aplicarEstado(card, aviso);
                 }
                 Class<?> destino;
-                if ("perfil".equals(aviso.getTipo())) {
+                if ("pedido_contratacao".equals(aviso.getTipo())) {
+                    // Pedido recebido: abre a lista onde o freelancer pode aceitar ou recusar.
+                    destino = PedidosRecebidosActivity.class;
+                } else if ("perfil".equals(aviso.getTipo())) {
                     destino = EditarPerfilActivity.class;
                 } else if ("pod".equals(aviso.getTipo())) {
                     destino = SkillPodsActivity.class;
                 } else {
                     destino = MinhasEquipesActivity.class;
                 }
+                startActivity(new Intent(NotificacoesActivity.this, destino));
             });
 
             listaNotificacoes.addView(card);
