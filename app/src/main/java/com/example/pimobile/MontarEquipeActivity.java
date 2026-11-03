@@ -29,8 +29,8 @@ public class MontarEquipeActivity extends AppCompatActivity {
         final int iconeRes;
         final int fundoRes;
 
-        PodOpcao(String id, String nome, String descricao, int pessoas, boolean digital,
-                 int iconeRes, int fundoRes) {
+        PodOpcao(String id, String nome, String descricao, int pessoas,
+                 boolean digital, int iconeRes, int fundoRes) {
             this.id = id;
             this.nome = nome;
             this.descricao = descricao;
@@ -40,44 +40,57 @@ public class MontarEquipeActivity extends AppCompatActivity {
             this.fundoRes = fundoRes;
         }
 
-        // Pod sem membros aprovados ainda não pode ser contratado
         boolean emFormacao() {
             return pessoas < 1;
         }
     }
 
-    private final int[] fundoIcone = {R.drawable.bg_icone_roxo, R.drawable.bg_icone_verde, R.drawable.bg_icone_laranja};
+    private final int[] fundoIcone = {
+            R.drawable.bg_icone_roxo,
+            R.drawable.bg_icone_verde,
+            R.drawable.bg_icone_laranja
+    };
 
     private final List<PodOpcao> todosPods = new ArrayList<>();
 
     private boolean formatoEscolhido = false;
     private boolean formatoSkillPods = false;
     private boolean mostrandoDigitais = true;
+
     private PodOpcao podSelecionado = null;
 
-    private TextView circ1, circ2, circ3, tabDigitais, tabPresenciais, txtResumo;
+    private TextView circ1, circ2, circ3;
+    private TextView tabDigitais, tabPresenciais, txtResumo;
+
     private View cardFreelancers, cardSkillPods, secaoPods;
+
     private ImageView checkFreelancers, checkSkillPods;
+
     private LinearLayout listaPods;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_montar_equipe);
+
         InsetsUtil.aplicar(this);
         MenuUtil.configurar(this);
 
         circ1 = findViewById(R.id.circ1);
         circ2 = findViewById(R.id.circ2);
         circ3 = findViewById(R.id.circ3);
+
         tabDigitais = findViewById(R.id.tabDigitais);
         tabPresenciais = findViewById(R.id.tabPresenciais);
         txtResumo = findViewById(R.id.txtResumo);
+
         cardFreelancers = findViewById(R.id.cardFreelancers);
         cardSkillPods = findViewById(R.id.cardSkillPods);
         secaoPods = findViewById(R.id.secaoPods);
+
         checkFreelancers = findViewById(R.id.checkFreelancers);
         checkSkillPods = findViewById(R.id.checkSkillPods);
+
         listaPods = findViewById(R.id.listaPods);
 
         carregarPods();
@@ -92,6 +105,7 @@ public class MontarEquipeActivity extends AppCompatActivity {
             podSelecionado = null;
             atualizarTela();
         });
+
         tabPresenciais.setOnClickListener(v -> {
             mostrandoDigitais = false;
             podSelecionado = null;
@@ -110,6 +124,7 @@ public class MontarEquipeActivity extends AppCompatActivity {
                 if (isFinishing() || isDestroyed()) return;
 
                 todosPods.clear();
+
                 for (SkillPod pod : pods) {
                     todosPods.add(new PodOpcao(
                             pod.getId(),
@@ -118,13 +133,18 @@ public class MontarEquipeActivity extends AppCompatActivity {
                             pod.getTotalPessoas(),
                             pod.isDigital(),
                             pod.getIconeRes(),
-                            fundoIcone[pod.getCor()]));
+                            fundoIcone[pod.getCor()]
+                    ));
                 }
 
-                // Pods contratáveis primeiro, "em formação" no fim.
-                // A ordenação é estável, então a ordem original (campo "ordem") é mantida.
-                Collections.sort(todosPods,
-                        (a, b) -> Boolean.compare(a.emFormacao(), b.emFormacao()));
+                // Pods contratáveis primeiro.
+                Collections.sort(
+                        todosPods,
+                        (a, b) -> Boolean.compare(
+                                a.emFormacao(),
+                                b.emFormacao()
+                        )
+                );
 
                 podSelecionado = null;
                 atualizarTela();
@@ -133,61 +153,118 @@ public class MontarEquipeActivity extends AppCompatActivity {
             @Override
             public void onErro(Exception e) {
                 if (isFinishing() || isDestroyed()) return;
-                Toast.makeText(MontarEquipeActivity.this,
-                        "Não foi possível carregar os Skill Pods", Toast.LENGTH_LONG).show();
+
+                Toast.makeText(
+                        MontarEquipeActivity.this,
+                        "Não foi possível carregar os Skill Pods",
+                        Toast.LENGTH_LONG
+                ).show();
             }
         });
     }
 
     private String montarDescricao(SkillPod pod) {
         String tags = TextUtils.join(", ", pod.getTags());
+
         String pessoas = pod.getTotalPessoas() < 1
                 ? "Em formação"
                 : pod.getTotalPessoas() + " pessoas";
+
         return tags.isEmpty() ? pessoas : tags + " · " + pessoas;
     }
 
     private void escolherFormato(boolean skillPods) {
         formatoEscolhido = true;
         formatoSkillPods = skillPods;
+
         if (!skillPods) {
             podSelecionado = null;
         }
+
         atualizarTela();
     }
 
     private void atualizarTela() {
         // Bolinhas do stepper
         setCirculo(circ1, formatoEscolhido);
-        setCirculo(circ2, formatoEscolhido && formatoSkillPods && podSelecionado != null);
+
+        setCirculo(
+                circ2,
+                formatoEscolhido
+                        && formatoSkillPods
+                        && podSelecionado != null
+        );
+
         setCirculo(circ3, false);
 
         // Cards de formato
         boolean freeSel = formatoEscolhido && !formatoSkillPods;
         boolean podsSel = formatoEscolhido && formatoSkillPods;
-        cardFreelancers.setBackgroundResource(freeSel
-                ? R.drawable.bg_card_opcao_selecionado : R.drawable.bg_card_opcao);
-        cardSkillPods.setBackgroundResource(podsSel
-                ? R.drawable.bg_card_opcao_selecionado : R.drawable.bg_card_opcao);
-        checkFreelancers.setVisibility(freeSel ? View.VISIBLE : View.GONE);
-        checkSkillPods.setVisibility(podsSel ? View.VISIBLE : View.GONE);
+
+        cardFreelancers.setBackgroundResource(
+                freeSel
+                        ? R.drawable.bg_card_opcao_selecionado
+                        : R.drawable.bg_card_opcao
+        );
+
+        cardSkillPods.setBackgroundResource(
+                podsSel
+                        ? R.drawable.bg_card_opcao_selecionado
+                        : R.drawable.bg_card_opcao
+        );
+
+        checkFreelancers.setVisibility(
+                freeSel ? View.VISIBLE : View.GONE
+        );
+
+        checkSkillPods.setVisibility(
+                podsSel ? View.VISIBLE : View.GONE
+        );
 
         // Seção de pods
-        secaoPods.setVisibility(podsSel ? View.VISIBLE : View.GONE);
-        tabDigitais.setBackgroundResource(mostrandoDigitais ? R.drawable.bg_segmento_ativo : 0);
-        tabDigitais.setTextColor(ContextCompat.getColor(this,
-                mostrandoDigitais ? R.color.branco : R.color.eq_texto_claro));
-        tabPresenciais.setBackgroundResource(!mostrandoDigitais ? R.drawable.bg_segmento_ativo : 0);
-        tabPresenciais.setTextColor(ContextCompat.getColor(this,
-                !mostrandoDigitais ? R.color.branco : R.color.eq_texto_claro));
+        secaoPods.setVisibility(
+                podsSel ? View.VISIBLE : View.GONE
+        );
+
+        tabDigitais.setBackgroundResource(
+                mostrandoDigitais
+                        ? R.drawable.bg_segmento_ativo
+                        : 0
+        );
+
+        tabDigitais.setTextColor(
+                ContextCompat.getColor(
+                        this,
+                        mostrandoDigitais
+                                ? R.color.branco
+                                : R.color.eq_texto_claro
+                )
+        );
+
+        tabPresenciais.setBackgroundResource(
+                !mostrandoDigitais
+                        ? R.drawable.bg_segmento_ativo
+                        : 0
+        );
+
+        tabPresenciais.setTextColor(
+                ContextCompat.getColor(
+                        this,
+                        !mostrandoDigitais
+                                ? R.color.branco
+                                : R.color.eq_texto_claro
+                )
+        );
 
         renderizarLista();
 
         // Resumo da barra inferior
         if (freeSel) {
-            txtResumo.setText("Freelancers individuais");
+            txtResumo.setText("Seleção de vários freelancers");
         } else if (podSelecionado != null) {
-            txtResumo.setText("1 pod · " + podSelecionado.pessoas + " pessoas");
+            txtResumo.setText(
+                    "1 pod · " + podSelecionado.pessoas + " pessoas"
+            );
         } else {
             txtResumo.setText("Nada selecionado");
         }
@@ -195,39 +272,66 @@ public class MontarEquipeActivity extends AppCompatActivity {
 
     private void renderizarLista() {
         listaPods.removeAllViews();
+
         LayoutInflater inflater = LayoutInflater.from(this);
 
         for (PodOpcao pod : todosPods) {
             if (pod.digital != mostrandoDigitais) continue;
 
-            View item = inflater.inflate(R.layout.item_pod_opcao, listaPods, false);
-            FrameLayout iconeContainer = item.findViewById(R.id.iconeContainer);
+            View item = inflater.inflate(
+                    R.layout.item_pod_opcao,
+                    listaPods,
+                    false
+            );
+
+            FrameLayout iconeContainer =
+                    item.findViewById(R.id.iconeContainer);
+
             ImageView imgIcone = item.findViewById(R.id.imgIcone);
             ImageView imgRadio = item.findViewById(R.id.imgRadio);
+
             TextView txtNome = item.findViewById(R.id.txtNome);
             TextView txtDescricao = item.findViewById(R.id.txtDescricao);
 
             iconeContainer.setBackgroundResource(pod.fundoRes);
             imgIcone.setImageResource(pod.iconeRes);
+
             txtNome.setText(pod.nome);
             txtDescricao.setText(pod.descricao);
 
-            // Pod em formação: aparece esmaecido e não pode ser selecionado
+            // Pod em formação não pode ser selecionado.
             if (pod.emFormacao()) {
                 item.setBackgroundResource(R.drawable.bg_card_opcao);
                 item.setAlpha(0.55f);
+
                 imgRadio.setVisibility(View.INVISIBLE);
-                item.setOnClickListener(v -> Toast.makeText(this,
-                        "Este pod ainda está em formação. Ele fica disponível quando tiver o primeiro membro.",
-                        Toast.LENGTH_SHORT).show());
+
+                item.setOnClickListener(v ->
+                        Toast.makeText(
+                                this,
+                                "Este pod ainda está em formação. "
+                                        + "Ele fica disponível quando tiver o primeiro membro.",
+                                Toast.LENGTH_SHORT
+                        ).show()
+                );
+
                 listaPods.addView(item);
                 continue;
             }
 
             boolean selecionado = pod == podSelecionado;
-            item.setBackgroundResource(selecionado
-                    ? R.drawable.bg_card_opcao_selecionado : R.drawable.bg_card_opcao);
-            imgRadio.setImageResource(selecionado ? R.drawable.ic_radio_on : R.drawable.ic_radio_off);
+
+            item.setBackgroundResource(
+                    selecionado
+                            ? R.drawable.bg_card_opcao_selecionado
+                            : R.drawable.bg_card_opcao
+            );
+
+            imgRadio.setImageResource(
+                    selecionado
+                            ? R.drawable.ic_radio_on
+                            : R.drawable.ic_radio_off
+            );
 
             item.setOnClickListener(v -> {
                 podSelecionado = (podSelecionado == pod) ? null : pod;
@@ -239,33 +343,67 @@ public class MontarEquipeActivity extends AppCompatActivity {
     }
 
     private void setCirculo(TextView circulo, boolean cheio) {
-        circulo.setBackgroundResource(cheio ? R.drawable.bg_circulo_ativo : R.drawable.bg_circulo_inativo);
-        circulo.setTextColor(ContextCompat.getColor(this,
-                cheio ? R.color.branco : R.color.eq_texto_claro));
+        circulo.setBackgroundResource(
+                cheio
+                        ? R.drawable.bg_circulo_ativo
+                        : R.drawable.bg_circulo_inativo
+        );
+
+        circulo.setTextColor(
+                ContextCompat.getColor(
+                        this,
+                        cheio
+                                ? R.color.branco
+                                : R.color.eq_texto_claro
+                )
+        );
     }
 
     private void continuar() {
         if (!formatoEscolhido) {
-            Toast.makeText(this, "Escolha como você quer trabalhar", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                    this,
+                    "Escolha como você quer trabalhar",
+                    Toast.LENGTH_SHORT
+            ).show();
             return;
         }
 
         if (!formatoSkillPods) {
-            startActivity(new Intent(this, ServicoActivity.class));
+            Intent intent = new Intent(
+                    this,
+                    ServicoActivity.class
+            );
+
+            intent.putExtra("modo_equipe", true);
+
+            startActivity(intent);
             return;
         }
 
         if (podSelecionado == null) {
-            Toast.makeText(this, "Escolha um skill pod", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                    this,
+                    "Escolha um skill pod",
+                    Toast.LENGTH_SHORT
+            ).show();
             return;
         }
 
-        Intent intent = new Intent(this, RevisaoEquipeActivity.class);
+        Intent intent = new Intent(
+                this,
+                RevisaoEquipeActivity.class
+        );
+
         intent.putExtra("pod_id", podSelecionado.id);
         intent.putExtra("pod_nome", podSelecionado.nome);
         intent.putExtra("pod_descricao", podSelecionado.descricao);
         intent.putExtra("pod_pessoas", podSelecionado.pessoas);
-        intent.putExtra("pod_tipo", podSelecionado.digital ? "Digital" : "Presencial");
+        intent.putExtra(
+                "pod_tipo",
+                podSelecionado.digital ? "Digital" : "Presencial"
+        );
+
         startActivity(intent);
     }
 }

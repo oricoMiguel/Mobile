@@ -14,23 +14,30 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
-
 import com.google.firebase.auth.FirebaseAuth;
 
 public class PerfilActivity extends AppCompatActivity {
+
+    private String usuarioIdVisualizado;
+    private boolean visualizandoOutroPerfil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perfil);
+
         InsetsUtil.aplicar(this);
+
+        usuarioIdVisualizado = getIntent().getStringExtra("usuarioId");
+
+        visualizandoOutroPerfil = usuarioIdVisualizado != null
+                && !usuarioIdVisualizado.trim().isEmpty();
 
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
 
-        findViewById(R.id.btnEditar).setOnClickListener(v ->
-                startActivity(new Intent(this, EditarPerfilActivity.class)));
-
         findViewById(R.id.btnLogout).setOnClickListener(v -> {
+            if (visualizandoOutroPerfil) return;
+
             FirebaseAuth.getInstance().signOut();
 
             Intent intent = new Intent(this, LoginActivity.class);
@@ -42,7 +49,12 @@ public class PerfilActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        carregarOpcoes();
+        if (visualizandoOutroPerfil) {
+            findViewById(R.id.btnLogout).setVisibility(View.GONE);
+            findViewById(R.id.listaOpcoes).setVisibility(View.GONE);
+        } else {
+            carregarOpcoes();
+        }
     }
 
     @Override
@@ -51,11 +63,18 @@ public class PerfilActivity extends AppCompatActivity {
         carregarPerfil();
     }
 
+    // =====================================================
+    // CARREGAMENTO DO PERFIL
+    // =====================================================
+
     private void carregarPerfil() {
-        PerfilRepository.getPerfilAtual(new Callback<Perfil>() {
+
+        Callback<Perfil> callback = new Callback<Perfil>() {
+
             @Override
             public void onSucesso(Perfil perfil) {
                 if (isFinishing() || isDestroyed()) return;
+
                 preencher(perfil);
             }
 
@@ -68,78 +87,146 @@ public class PerfilActivity extends AppCompatActivity {
                         "Não foi possível carregar o perfil",
                         Toast.LENGTH_LONG
                 ).show();
+
+                if (visualizandoOutroPerfil) {
+                    finish();
+                }
             }
-        });
+        };
+
+        if (visualizandoOutroPerfil) {
+            PerfilRepository.getPerfilPorId(usuarioIdVisualizado, callback);
+        } else {
+            PerfilRepository.getPerfilAtual(callback);
+        }
     }
 
-    private void preencher(Perfil perfil) {
-        TextView txtIniciais = findViewById(R.id.txtIniciais);
-        txtIniciais.setText(perfil.getIniciais());
+    // =====================================================
+    // PREENCHIMENTO DAS INFORMAÇÕES
+    // =====================================================
 
+    private void preencher(Perfil perfil) {
+
+        if (perfil == null) return;
+
+        TextView txtIniciais = findViewById(R.id.txtIniciais);
         ImageView imgFotoPerfil = findViewById(R.id.imgFotoPerfil);
-        String fotoUsuario = perfil.getFotoUrl();
-        if (fotoUsuario != null && !fotoUsuario.trim().isEmpty()) {
-            Glide.with(PerfilActivity.this).load(fotoUsuario).circleCrop().into(imgFotoPerfil);
+
+        String iniciais = textoSeguro(perfil.getIniciais());
+        String fotoUsuario = textoSeguro(perfil.getFotoUrl());
+
+        txtIniciais.setText(iniciais);
+
+        if (!fotoUsuario.isEmpty()) {
+
+            Glide.with(this)
+                    .load(fotoUsuario)
+                    .circleCrop()
+                    .into(imgFotoPerfil);
+
             imgFotoPerfil.setVisibility(View.VISIBLE);
             txtIniciais.setVisibility(View.GONE);
+
         } else {
+
+            Glide.with(this).clear(imgFotoPerfil);
+
             imgFotoPerfil.setVisibility(View.GONE);
             txtIniciais.setVisibility(View.VISIBLE);
         }
 
-        // Mantém compatibilidade com fotos antigas de freelancers que foram salvas
-        // apenas no documento /freelancers/{uid}.
-        if ("Freelancer".equals(perfil.getTipoConta())) {
-            FreelancerRepository.getMeuPerfil(new Callback<PerfilProfissional>() {
-                @Override
-                public void onSucesso(PerfilProfissional profissional) {
-                    if (isFinishing() || isDestroyed()) return;
-                    if (profissional != null && profissional.getFotoUrl() != null
-                            && !profissional.getFotoUrl().trim().isEmpty()) {
-                        Glide.with(PerfilActivity.this)
-                                .load(profissional.getFotoUrl())
-                                .circleCrop()
-                                .into(imgFotoPerfil);
-                        imgFotoPerfil.setVisibility(View.VISIBLE);
-                        txtIniciais.setVisibility(View.GONE);
+        // Compatibilidade com fotos antigas de freelancers.
+        if (!visualizandoOutroPerfil
+                && "Freelancer".equals(perfil.getTipoConta())) {
+
+            FreelancerRepository.getMeuPerfil(
+                    new Callback<PerfilProfissional>() {
+
+                        @Override
+                        public void onSucesso(PerfilProfissional profissional) {
+
+                            if (isFinishing() || isDestroyed()) return;
+
+                            if (profissional != null
+                                    && profissional.getFotoUrl() != null
+                                    && !profissional.getFotoUrl().trim().isEmpty()) {
+
+                                Glide.with(PerfilActivity.this)
+                                        .load(profissional.getFotoUrl())
+                                        .circleCrop()
+                                        .into(imgFotoPerfil);
+
+                                imgFotoPerfil.setVisibility(View.VISIBLE);
+                                txtIniciais.setVisibility(View.GONE);
+                            }
+                        }
+
+                        @Override
+                        public void onErro(Exception e) {
+                            // Mantém a foto atual ou as iniciais.
+                        }
                     }
-                }
-                @Override
-                public void onErro(Exception e) {
-                    // Se já existe foto em /usuarios, ela permanece visível; senão ficam as iniciais.
-                }
-            });
+            );
         }
 
+        // Nome.
+        String nome = textoSeguro(perfil.getNome());
+
         ((TextView) findViewById(R.id.txtNome))
-                .setText(perfil.getNome());
+                .setText(nome);
+
+        // Tipo de conta.
+        String tipoConta = textoSeguro(perfil.getTipoConta());
 
         ((TextView) findViewById(R.id.txtTipoConta))
-                .setText(perfil.getTipoConta());
+                .setText(tipoConta);
 
-        ((TextView) findViewById(R.id.txtEmail))
-                .setText(perfil.getEmail());
+        // E-mail.
+        TextView txtEmail = findViewById(R.id.txtEmail);
 
+        String email = textoSeguro(perfil.getEmail());
+
+        txtEmail.setText(email);
+
+        txtEmail.setVisibility(
+                email.isEmpty() ? View.GONE : View.VISIBLE
+        );
+
+        // Selo de verificação.
         findViewById(R.id.badgeVerificado).setVisibility(
                 perfil.isVerificado() ? View.VISIBLE : View.GONE
         );
 
-        TextView txtTelefone = findViewById(R.id.txtTelefonePerfil);
-        TextView txtEmpresa = findViewById(R.id.txtEmpresaPerfil);
-        TextView txtLocalizacao = findViewById(R.id.txtLocalizacaoPerfil);
-        boolean ehUsuario = !"Freelancer".equals(perfil.getTipoConta());
-        txtTelefone.setVisibility(ehUsuario && !perfil.getTelefone().trim().isEmpty() ? View.VISIBLE : View.GONE);
-        txtEmpresa.setVisibility(ehUsuario && !perfil.getEmpresa().trim().isEmpty() ? View.VISIBLE : View.GONE);
-        String localizacao = (perfil.getCidade() + (perfil.getCidade().isEmpty() || perfil.getEstado().isEmpty() ? "" : " - ") + perfil.getEstado()).trim();
-        txtLocalizacao.setText(localizacao);
-        txtLocalizacao.setVisibility(ehUsuario && !localizacao.isEmpty() ? View.VISIBLE : View.GONE);
-        txtTelefone.setText("Telefone: " + perfil.getTelefone());
-        txtEmpresa.setText("Organização: " + perfil.getEmpresa());
+        // =================================================
+        // INFORMAÇÕES COMPLEMENTARES OCULTAS NESTA TELA
+        // =================================================
+
+        findViewById(R.id.txtTelefonePerfil).setVisibility(View.GONE);
+        findViewById(R.id.txtEmpresaPerfil).setVisibility(View.GONE);
+        findViewById(R.id.txtLocalizacaoPerfil).setVisibility(View.GONE);
+        findViewById(R.id.tituloInformacoes).setVisibility(View.GONE);
     }
 
+    private String textoSeguro(String valor) {
+        return valor == null ? "" : valor.trim();
+    }
+
+    // =====================================================
+    // OPÇÕES DO PRÓPRIO PERFIL
+    // =====================================================
+
     private void carregarOpcoes() {
+
         LinearLayout lista = findViewById(R.id.listaOpcoes);
+
         lista.removeAllViews();
+
+        if (visualizandoOutroPerfil) {
+            lista.setVisibility(View.GONE);
+            return;
+        }
+
+        lista.setVisibility(View.VISIBLE);
 
         adicionar(
                 lista,
@@ -170,16 +257,22 @@ public class PerfilActivity extends AppCompatActivity {
         );
     }
 
+    // =====================================================
+    // CRIAÇÃO DAS OPÇÕES
+    // =====================================================
+
     private void adicionar(
             LinearLayout lista,
             int iconeRes,
             String titulo,
             Class<?> destino
     ) {
+
         View item = LayoutInflater.from(this)
                 .inflate(R.layout.item_perfil_opcao, lista, false);
 
         ImageView icone = item.findViewById(R.id.imgIcone);
+
         icone.setImageResource(iconeRes);
 
         icone.setColorFilter(
@@ -190,6 +283,7 @@ public class PerfilActivity extends AppCompatActivity {
                 .setText(titulo);
 
         item.setOnClickListener(v -> {
+
             if (destino == null) {
                 emBreve();
             } else {
@@ -200,7 +294,12 @@ public class PerfilActivity extends AppCompatActivity {
         lista.addView(item);
     }
 
+    // =====================================================
+    // AVISO DE FUNCIONALIDADE FUTURA
+    // =====================================================
+
     private void emBreve() {
+
         Toast.makeText(
                 this,
                 "Em breve",

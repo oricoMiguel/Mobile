@@ -17,6 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import android.view.View;
 
 public class CadastroActivity extends AppCompatActivity {
 
@@ -34,8 +35,34 @@ public class CadastroActivity extends AppCompatActivity {
         TextView txtJaTenhoConta = findViewById(R.id.txtJaTenhoConta);
 
         String[] tipos = {"Freelancer", "Usuário"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_dropdown_item, tipos);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this,
+                R.layout.item_spinner_cadastro,
+                tipos
+        ) {
+            @Override
+            public View getDropDownView(int position, View convertView,
+                                        android.view.ViewGroup parent) {
+
+                View view = super.getDropDownView(position, convertView, parent);
+
+                TextView texto = (TextView) view;
+                texto.setTextColor(
+                        androidx.core.content.ContextCompat.getColor(
+                                CadastroActivity.this,
+                                R.color.eq_escuro
+                        )
+                );
+
+                return view;
+            }
+        };
+
+        adapter.setDropDownViewResource(
+                R.layout.item_spinner_cadastro_dropdown
+        );
+
         spinner.setAdapter(adapter);
 
         FirebaseAuth auth = FirebaseAuth.getInstance();

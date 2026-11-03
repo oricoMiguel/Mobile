@@ -29,6 +29,55 @@ public class ParticipacaoRepository {
                 .addOnFailureListener(callback::onErro);
     }
 
+
+    public static void getPerfilPorId(String usuarioId, Callback<Perfil> callback) {
+
+        if (usuarioId == null || usuarioId.trim().isEmpty()) {
+            callback.onErro(new IllegalArgumentException("Usuário inválido"));
+            return;
+        }
+
+        FirebaseFirestore.getInstance()
+                .collection("usuarios")
+                .document(usuarioId)
+                .get()
+                .addOnSuccessListener(doc -> {
+
+                    if (!doc.exists()) {
+                        callback.onErro(
+                                new IllegalStateException("Perfil não encontrado"));
+                        return;
+                    }
+
+                    String nome = doc.getString("nome");
+                    String email = doc.getString("email");
+                    String tipoConta = doc.getString("tipoConta");
+
+                    if (nome == null || nome.trim().isEmpty()) {
+                        nome = "Sem nome";
+                    }
+
+                    if (tipoConta == null) {
+                        tipoConta = "Usuário";
+                    }
+
+                    callback.onSucesso(new Perfil(
+                            nome,
+                            email,
+                            tipoConta,
+                            Boolean.TRUE.equals(doc.getBoolean("verificado")),
+                            0,
+                            doc.getString("telefone"),
+                            doc.getString("empresa"),
+                            doc.getString("cidade"),
+                            doc.getString("estado"),
+                            doc.getString("fotoUrl"),
+                            doc.getString("fotoPublicId")
+                    ));
+                })
+                .addOnFailureListener(callback::onErro);
+    }
+
     // statusAtual: null se nunca pediu, "recusada" se está pedindo de novo
     public static void pedirEntrada(String podId, String podNome, String nome,
                                     String statusAtual, Callback<Void> callback) {

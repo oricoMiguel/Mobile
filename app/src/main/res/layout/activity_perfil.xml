@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/conteudoPrincipal"
     android:layout_width="match_parent"
@@ -21,9 +20,10 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingBottom="24dp">
 
-                <!-- Cabeçalho curvo -->
+                <!-- Cabeçalho -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="170dp"
@@ -40,24 +40,9 @@
                         android:padding="6dp"
                         android:src="@drawable/ic_back" />
 
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1" />
-
-                    <TextView
-                        android:id="@+id/btnEditar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="36dp"
-                        android:gravity="center"
-                        android:paddingHorizontal="8dp"
-                        android:text="Editar"
-                        android:textColor="@color/branco"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Avatar com iniciais -->
+                <!-- Foto de perfil -->
                 <FrameLayout
                     android:layout_width="124dp"
                     android:layout_height="124dp"
@@ -87,7 +72,8 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:layout_gravity="bottom|end"
-                        android:background="@drawable/bg_badge_verificado">
+                        android:background="@drawable/bg_badge_verificado"
+                        android:visibility="gone">
 
                         <ImageView
                             android:layout_width="16dp"
@@ -95,9 +81,12 @@
                             android:layout_gravity="center"
                             android:contentDescription="Verificado"
                             android:src="@drawable/ic_check_white" />
+
                     </FrameLayout>
+
                 </FrameLayout>
 
+                <!-- Nome -->
                 <TextView
                     android:id="@+id/txtNome"
                     android:layout_width="match_parent"
@@ -105,57 +94,90 @@
                     android:layout_marginTop="12dp"
                     android:gravity="center"
                     android:textColor="@color/eq_escuro"
-                    android:textSize="22sp"
+                    android:textSize="23sp"
                     android:textStyle="bold" />
 
+                <!-- Tipo de conta -->
                 <TextView
                     android:id="@+id/txtTipoConta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:gravity="center"
                     android:textColor="@color/roxo_icone"
-                    android:textSize="13sp" />
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
+                <!-- E-mail -->
                 <TextView
                     android:id="@+id/txtEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="5dp"
                     android:gravity="center"
                     android:textColor="@color/eq_texto_claro"
-                    android:textSize="13sp" />
+                    android:textSize="14sp" />
 
-                <TextView
-                    android:id="@+id/txtTelefonePerfil"
+                <!-- Informações complementares -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"
-                    android:textColor="@color/eq_texto_claro"
-                    android:textSize="13sp"
-                    android:visibility="gone" />
+                    android:layout_marginTop="28dp"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp">
 
-                <TextView
-                    android:id="@+id/txtEmpresaPerfil"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center"
-                    android:textColor="@color/eq_texto_claro"
-                    android:textSize="13sp"
-                    android:visibility="gone" />
+                    <TextView
+                        android:id="@+id/tituloInformacoes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="Informações"
+                        android:textColor="@color/eq_escuro"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
 
-                <TextView
-                    android:id="@+id/txtLocalizacaoPerfil"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center"
-                    android:textColor="@color/eq_texto_claro"
-                    android:textSize="13sp"
-                    android:visibility="gone" />
+                    <!-- Telefone -->
+                    <TextView
+                        android:id="@+id/txtTelefonePerfil"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:background="@drawable/bg_card_opcao"
+                        android:padding="16dp"
+                        android:textColor="@color/eq_escuro"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp"
+                        android:visibility="gone" />
 
-                <!-- Opções (criadas pelo Java) -->
+                    <!-- Organização -->
+                    <TextView
+                        android:id="@+id/txtEmpresaPerfil"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:background="@drawable/bg_card_opcao"
+                        android:padding="16dp"
+                        android:textColor="@color/eq_escuro"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp"
+                        android:visibility="gone" />
+
+                    <!-- Localização -->
+                    <TextView
+                        android:id="@+id/txtLocalizacaoPerfil"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_card_opcao"
+                        android:padding="16dp"
+                        android:textColor="@color/eq_escuro"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="4dp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <!-- Opções do próprio perfil -->
                 <LinearLayout
                     android:id="@+id/listaOpcoes"
                     android:layout_width="match_parent"
@@ -164,15 +186,19 @@
                     android:orientation="vertical"
                     android:paddingHorizontal="16dp"
                     android:paddingBottom="12dp" />
+
             </LinearLayout>
+
         </ScrollView>
 
-        <!-- Logout fixo -->
+        <!-- Botão sair -->
         <LinearLayout
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/branco"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="horizontal"
             android:padding="16dp">
@@ -190,6 +216,9 @@
                 android:text="Sair"
                 android:textColor="@color/eq_texto_claro"
                 android:textSize="15sp" />
+
         </LinearLayout>
+
     </LinearLayout>
+
 </FrameLayout>

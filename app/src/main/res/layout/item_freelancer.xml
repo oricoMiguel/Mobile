@@ -37,6 +37,7 @@
                 android:layout_width="14dp"
                 android:layout_height="14dp"
                 android:layout_gravity="bottom|end" />
+
         </FrameLayout>
 
         <LinearLayout
@@ -60,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/eq_texto_claro"
                 android:textSize="13sp" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -82,10 +84,12 @@
                 android:textColor="@color/eq_escuro"
                 android:textSize="14sp"
                 android:textStyle="bold" />
+
         </LinearLayout>
+
     </LinearLayout>
 
-    <!-- Habilidades (criadas pelo Java) -->
+    <!-- Habilidades -->
     <LinearLayout
         android:id="@+id/listaHabilidades"
         android:layout_width="match_parent"
@@ -93,6 +97,7 @@
         android:layout_marginTop="12dp"
         android:orientation="horizontal" />
 
+    <!-- Disponibilidade e ações -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -108,10 +113,22 @@
             android:textSize="12sp"
             android:textStyle="bold" />
 
+        <CheckBox
+            android:id="@+id/chkSelecionar"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            android:buttonTint="@color/roxo_icone"
+            android:text="Selecionar"
+            android:textColor="@color/eq_escuro"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnVerPerfil"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
+            android:layout_marginStart="12dp"
             android:background="@drawable/bg_botao_escuro"
             android:paddingHorizontal="22dp"
             android:text="Ver perfil"
@@ -119,5 +136,7 @@
             android:textColor="@color/branco"
             android:textSize="13sp"
             android:textStyle="bold" />
+
     </LinearLayout>
+
 </LinearLayout>

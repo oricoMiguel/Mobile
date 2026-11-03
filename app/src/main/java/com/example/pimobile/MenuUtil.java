@@ -1,3 +1,4 @@
+
 package com.example.pimobile;
 
 import android.app.Activity;
@@ -13,7 +14,8 @@ public class MenuUtil {
         DrawerLayout drawer = activity.findViewById(R.id.drawerLayout);
         ImageView btnMenu = activity.findViewById(R.id.btnMenu);
 
-        btnMenu.setOnClickListener(v -> drawer.openDrawer(GravityCompat.END));
+        btnMenu.setOnClickListener(v ->
+                drawer.openDrawer(GravityCompat.END));
 
         ligar(activity, drawer, R.id.menuInicio, HomeActivity.class);
         ligar(activity, drawer, R.id.menuServicos, ServicoActivity.class);
@@ -21,11 +23,14 @@ public class MenuUtil {
         ligar(activity, drawer, R.id.menuAdm, AdmActivity.class);
         ligar(activity, drawer, R.id.menuMonteEquipe, MontarEquipeActivity.class);
         ligar(activity, drawer, R.id.menuPerfil, PerfilActivity.class);
+        ligar(activity, drawer, R.id.menuPrecisaAjuda, ChatbotActivity.class);
     }
 
-    private static void ligar(Activity activity, DrawerLayout drawer, int id, Class<?> destino) {
+    private static void ligar(Activity activity, DrawerLayout drawer,
+                              int id, Class<?> destino) {
         activity.findViewById(id).setOnClickListener(v -> {
             drawer.closeDrawer(GravityCompat.END);
+
             if (!activity.getClass().equals(destino)) {
                 Intent intent = new Intent(activity, destino);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
