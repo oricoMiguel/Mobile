@@ -49,5 +49,5 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation("com.cloudinary:cloudinary-android:3.1.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
-
+    implementation("io.noties.markwon:core:4.6.2")
 }

@@ -1,3 +1,4 @@
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -52,8 +53,9 @@
 
     </LinearLayout>
 
-    <!-- Área de apresentação -->
+    <!-- Área de mensagens -->
     <ScrollView
+        android:id="@+id/scrollMensagens"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -62,40 +64,10 @@
         android:scrollbars="none">
 
         <LinearLayout
+            android:id="@+id/layoutMensagens"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <TextView
-                android:layout_width="76dp"
-                android:layout_height="76dp"
-                android:background="#E8DDF7"
-                android:gravity="center"
-                android:text="✦"
-                android:textColor="#553C9A"
-                android:textSize="42sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Olá! Como posso ajudar?"
-                android:textColor="#382052"
-                android:textSize="21sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:text="Sou o assistente virtual do SERV+. Posso ajudar você com freelancers, serviços e Skill Pods!"
-                android:textColor="#777080"
-                android:textSize="14sp" />
-
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
 
     </ScrollView>
 
@@ -124,6 +96,7 @@
             android:textSize="14sp" />
 
         <TextView
+            android:id="@+id/btnEnviarChat"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginStart="8dp"
