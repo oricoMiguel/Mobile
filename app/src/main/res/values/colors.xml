@@ -48,4 +48,10 @@
     <color name="adm_alerta_borda">#8A6A4A</color>
     <color name="adm_amarelo">#F2B84B</color>
     <color name="adm_divisor">#ECE8F5</color>
+    <color name="menu_destaque">#B9A6FF</color>
+    <color name="menu_item_ativo">#3A2D63</color>
+    <color name="menu_texto_suave">#9F97B8</color>
+    <color name="menu_divisor">#3A3352</color>
+    <color name="menu_sair">#FF8A8A</color>
+    <color name="menu_ripple">#33FFFFFF</color>
 </resources>

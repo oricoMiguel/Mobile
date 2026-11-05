@@ -81,6 +81,14 @@ public class AdmRepository {
                 })
                 .addOnFailureListener(callback::onErro);
     }
+    public static void ehAdmin(Callback<Boolean> callback) {
+        FirebaseFirestore.getInstance()
+                .collection("usuarios")
+                .count()
+                .get(AggregateSource.SERVER)
+                .addOnSuccessListener(snap -> callback.onSucesso(true))
+                .addOnFailureListener(e -> callback.onSucesso(false));
+    }
 
     // true quando as regras do Firestore recusaram a leitura (usuário não é admin)
     public static boolean permissaoNegada(Exception e) {

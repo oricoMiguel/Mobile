@@ -1,76 +1,210 @@
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/barra_topo"
+    android:background="@drawable/bg_drawer"
     android:clickable="true"
     android:focusable="true"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
-    android:paddingTop="72dp"
-    android:paddingHorizontal="16dp">
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/menuInicio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:text="Início"
-        android:textColor="@color/branco"
-        android:textSize="20sp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:scrollbars="none">
 
-    <TextView
-        android:id="@+id/menuServicos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:text="Serviços"
-        android:textColor="@color/branco"
-        android:textSize="20sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="56dp"
+            android:paddingBottom="16dp">
 
-    <TextView
-        android:id="@+id/menuSkillPods"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:text="Skill Pods"
-        android:textColor="@color/branco"
-        android:textSize="20sp" />
+            <!-- Cabeçalho do usuário -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp"
+                android:paddingBottom="20dp">
 
-    <TextView
-        android:id="@+id/menuAdm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:text="ADM"
-        android:textColor="@color/branco"
-        android:textSize="20sp" />
+                <!-- Avatar -->
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_avatar"
+                    android:clipToOutline="true">
 
-    <TextView
-        android:id="@+id/menuMonteEquipe"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:text="Monte sua Equipe"
-        android:textColor="@color/branco"
-        android:textSize="20sp" />
+                    <ImageView
+                        android:id="@+id/menuAvatarFoto"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/menuPerfil"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:text="Perfil"
-        android:textColor="@color/branco"
-        android:textSize="20sp" />
+                    <TextView
+                        android:id="@+id/menuAvatarIniciais"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="M"
+                        android:textColor="@color/branco"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/menuPrecisaAjuda"
-        android:layout_width="wrap_content"
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/menuNome"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="Nome"
+                        android:textColor="@color/branco"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/menuEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="email@exemplo.com"
+                        android:textColor="@color/menu_texto_suave"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/menuPapel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_chip_papel"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="3dp"
+                        android:text="Cliente"
+                        android:textColor="@color/menu_destaque"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- EXPLORAR -->
+            <TextView
+                style="@style/ServMenuSecao"
+                android:text="EXPLORAR" />
+
+            <TextView
+                android:id="@+id/menuInicio"
+                style="@style/ServMenuItem"
+                android:drawableStart="@drawable/ic_menu_home"
+                android:text="Início" />
+
+            <TextView
+                android:id="@+id/menuServicos"
+                style="@style/ServMenuItem"
+                android:drawableStart="@drawable/ic_menu_servicos"
+                android:text="Serviços" />
+
+            <TextView
+                android:id="@+id/menuSkillPods"
+                style="@style/ServMenuItem"
+                android:drawableStart="@drawable/ic_menu_pods"
+                android:text="Skill Pods" />
+
+            <!-- MINHA CONTA -->
+            <TextView
+                style="@style/ServMenuSecao"
+                android:text="MINHA CONTA" />
+
+            <TextView
+                android:id="@+id/menuPerfil"
+                style="@style/ServMenuItem"
+                android:drawableStart="@drawable/ic_menu_perfil"
+                android:text="Perfil" />
+
+            <!-- ADMIN -->
+            <TextView
+                android:id="@+id/menuSecaoAdm"
+                style="@style/ServMenuSecao"
+                android:text="ADMINISTRAÇÃO" />
+
+            <TextView
+                android:id="@+id/menuAdm"
+                style="@style/ServMenuItem"
+                android:drawableStart="@drawable/ic_menu_adm"
+                android:text="ADM" />
+
+            <!-- Ação principal -->
+            <TextView
+                android:id="@+id/menuMonteEquipe"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_btn_monte_equipe"
+                android:drawableStart="@drawable/ic_menu_add"
+                android:drawablePadding="10dp"
+                android:drawableTint="@color/barra_topo"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="Monte sua Equipe"
+                android:textColor="@color/barra_topo"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Rodapé -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/menu_divisor" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"
-        android:text="Precisa de ajuda?"
-        android:textColor="@color/branco"
-        android:textSize="20sp" />
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:id="@+id/menuPrecisaAjuda"
+            style="@style/ServMenuItem"
+            android:drawableStart="@drawable/ic_menu_ajuda"
+            android:text="Precisa de ajuda?" />
+
+        <TextView
+            android:id="@+id/menuSair"
+            style="@style/ServMenuItem"
+            android:drawableStart="@drawable/ic_menu_sair"
+            android:drawableTint="@color/menu_sair"
+            android:text="Sair"
+            android:textColor="@color/menu_sair" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:text="SERV+ v1.0"
+            android:textColor="@color/menu_texto_suave"
+            android:textSize="12sp" />
+
+    </LinearLayout>
 
 </LinearLayout>

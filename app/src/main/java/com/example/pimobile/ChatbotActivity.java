@@ -273,7 +273,7 @@ public class ChatbotActivity extends AppCompatActivity {
 
             conexao.setRequestMethod("POST");
             conexao.setConnectTimeout(15000);
-            conexao.setReadTimeout(30000);
+            conexao.setReadTimeout(90000);
             conexao.setDoOutput(true);
 
             conexao.setRequestProperty(
@@ -325,7 +325,10 @@ public class ChatbotActivity extends AppCompatActivity {
             }
 
             if (codigo < 200 || codigo >= 300) {
-                throw new Exception("Erro HTTP: " + codigo);
+                throw new Exception(
+                        "Erro HTTP: " + codigo +
+                                " | Resposta do servidor: " + resultado
+                );
             }
 
             return new JSONObject(resultado.toString());
