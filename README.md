@@ -10,7 +10,7 @@ Aplicativo Android que conecta pessoas e empresas a freelancers e a equipes modu
 ![Android](https://img.shields.io/badge/Android-Nativo-3DDC84?logo=android&logoColor=white)
 ![Java](https://img.shields.io/badge/Java-ED8B00?logo=openjdk&logoColor=white)
 ![Android Studio](https://img.shields.io/badge/Android%20Studio-3DDC84?logo=androidstudio&logoColor=white)
-![Status](https://img.shields.io/badge/status-em%20desenvolvimento-6B21A8)
+![Status](https://img.shields.io/badge/status-%20feito-6B21A8)
 
 </div>
 
