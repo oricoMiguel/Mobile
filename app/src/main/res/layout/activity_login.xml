@@ -112,19 +112,22 @@
 
                 <!-- Botão ENTRAR com brilho -->
                 <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnEntrar"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:layout_marginTop="32dp"
-                    android:background="@drawable/bg_botao"
-                    android:elevation="10dp"
-                    android:outlineAmbientShadowColor="@color/brilho_botao"
-                    android:outlineSpotShadowColor="@color/brilho_botao"
-                    android:stateListAnimator="@null"
-                    android:text="ENTRAR"
-                    android:textColor="@color/branco"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                android:id="@+id/btnEntrar"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/bg_botao"
+                android:elevation="10dp"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:padding="0dp"
+                android:outlineAmbientShadowColor="@color/brilho_botao"
+                android:outlineSpotShadowColor="@color/brilho_botao"
+                android:stateListAnimator="@null"
+                android:text="ENTRAR"
+                android:textColor="@color/branco"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
                 <!-- Esqueci a senha / Criar conta -->
                 <LinearLayout
@@ -150,12 +153,28 @@
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:background="@drawable/bg_botao_outline"
+                        android:gravity="center"
                         android:paddingHorizontal="24dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="0dp"
                         android:text="Criar conta"
                         android:textAllCaps="false"
                         android:textColor="@color/roxo_card"
                         android:textSize="14sp" />
                 </LinearLayout>
+
+                <!-- Reenviar verificação de e-mail -->
+                <TextView
+                    android:id="@+id/txtReenviarVerificacao"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="Não recebeu o e-mail? Reenviar verificação"
+                    android:textColor="@color/roxo_card"
+                    android:textSize="13sp" />
+
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>

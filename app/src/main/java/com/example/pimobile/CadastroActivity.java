@@ -1,7 +1,9 @@
+
 package com.example.pimobile;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,12 +14,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
-import android.view.View;
 
 public class CadastroActivity extends AppCompatActivity {
 
@@ -69,17 +71,23 @@ public class CadastroActivity extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         btnEntrar.setOnClickListener(v -> {
+
             String nome = edtNome.getText().toString().trim();
             String email = edtEmail.getText().toString().trim();
             String senha = edtSenha.getText().toString();
             String tipo = spinner.getSelectedItem().toString();
 
             if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
-                Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,
+                        "Preencha todos os campos",
+                        Toast.LENGTH_SHORT).show();
                 return;
             }
+
             if (senha.length() < 6) {
-                Toast.makeText(this, "A senha precisa ter pelo menos 6 caracteres", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,
+                        "A senha precisa ter pelo menos 6 caracteres",
+                        Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -87,7 +95,19 @@ public class CadastroActivity extends AppCompatActivity {
 
             auth.createUserWithEmailAndPassword(email, senha)
                     .addOnSuccessListener(resultado -> {
-                        String uid = resultado.getUser().getUid();
+
+                        FirebaseUser usuarioFirebase = resultado.getUser();
+
+                        if (usuarioFirebase == null) {
+                            btnEntrar.setEnabled(true);
+
+                            Toast.makeText(this,
+                                    "Não foi possível identificar a conta criada",
+                                    Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
+                        String uid = usuarioFirebase.getUid();
 
                         Map<String, Object> usuario = new HashMap<>();
                         usuario.put("nome", nome);
@@ -98,22 +118,77 @@ public class CadastroActivity extends AppCompatActivity {
 
                         db.collection("usuarios").document(uid).set(usuario)
                                 .addOnSuccessListener(x -> {
-                                    startActivity(new Intent(this, HomeActivity.class));
-                                    finish();
+
+                                    // MARCA A CONTA COMO PRIMEIRO ACESSO
+                                    getSharedPreferences(
+                                            MainActivity.PREFS_LOGIN,
+                                            MODE_PRIVATE
+                                    ).edit()
+                                            .putString(
+                                                    MainActivity.CHAVE_PRIMEIRO_ACESSO_UID,
+                                                    uid
+                                            )
+                                            .apply();
+
+                                    // ENVIA SOMENTE A VERIFICAÇÃO INICIAL
+                                    usuarioFirebase.sendEmailVerification()
+                                            .addOnSuccessListener(y -> {
+
+                                                auth.signOut();
+
+                                                Toast.makeText(this,
+                                                        "Cadastro realizado! Verifique seu e-mail para confirmar sua conta.",
+                                                        Toast.LENGTH_LONG).show();
+
+                                                startActivity(new Intent(
+                                                        CadastroActivity.this,
+                                                        LoginActivity.class
+                                                ));
+
+                                                finish();
+                                            })
+                                            .addOnFailureListener(e -> {
+
+                                                auth.signOut();
+
+                                                Toast.makeText(this,
+                                                        "Conta criada, mas não foi possível enviar o e-mail de verificação. Tente entrar novamente.",
+                                                        Toast.LENGTH_LONG).show();
+
+                                                startActivity(new Intent(
+                                                        CadastroActivity.this,
+                                                        LoginActivity.class
+                                                ));
+
+                                                finish();
+                                            });
                                 })
                                 .addOnFailureListener(e -> {
+
                                     btnEntrar.setEnabled(true);
-                                    Toast.makeText(this, "Conta criada, mas falhou ao salvar o perfil", Toast.LENGTH_LONG).show();
+
+                                    Toast.makeText(this,
+                                            "Conta criada, mas falhou ao salvar o perfil",
+                                            Toast.LENGTH_LONG).show();
                                 });
                     })
                     .addOnFailureListener(e -> {
+
                         btnEntrar.setEnabled(true);
-                        Toast.makeText(this, AuthErros.traduzir(e), Toast.LENGTH_LONG).show();
+
+                        Toast.makeText(this,
+                                AuthErros.traduzir(e),
+                                Toast.LENGTH_LONG).show();
                     });
         });
 
         txtJaTenhoConta.setOnClickListener(v -> {
-            startActivity(new Intent(CadastroActivity.this, LoginActivity.class));
+
+            startActivity(new Intent(
+                    CadastroActivity.this,
+                    LoginActivity.class
+            ));
+
             finish();
         });
     }
